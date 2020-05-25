@@ -1,0 +1,111 @@
+#========================
+# GLOBAL SETTINGS
+#========================
+
+JOBT  80                       # (80) BASIC data (81) EVOS data
+                               # (87) TEST run (88) pause (89) exit
+
+#--- system 
+TSPC  13                       # atomic number of the elements
+QUET  1                        # (0) torque (1) slurm (2) IBM-lsf
+
+NDIM  3                        # dimensionality of the unit cell
+LBOX  20.0                     # unit cell size: should be non-zero for BASIC
+
+#--- DFT final runs
+MAXJ  10                       # max number of DFT jobs to be submitted at once
+ECUT  500.0                    # energy cut-off for DFT (0=default)
+PREC  acc                      # precision of the DFT run (norm,acc)
+KDNS  8000                     # k-mesh density for DFT runs
+SMER  1                        # VASP ISMEAR
+SIGM  0.1                      # SIGMA for smearing (automatically 0.01 for REFS and CLST)
+
+#--- DFT pre-relaxation 
+nsw0  5                  
+ecut  0.0                       
+prec  norm
+kdns  4000
+
+#--- neural network parameters
+LREG  1e-8                     # regularization
+NNNU  10 10                    # number of neurons in hidden layers
+NNGT  1  1                     # activation function type for hidden layers
+
+#--- parsing parameters
+NPAR  8                        # number of cores used for parsing
+NSYM  51                       # number of symmetry function components
+RCUT  1                        # BP sym. func. cut-off radius (0) 6 A (1) 7.5 A
+FMRK  0.5                      # ratio of atomic forces for training
+
+#========================
+# EVOS DATA MODE
+#========================
+
+#--- RND mode general setting
+SITR  0                        # start from this cycle (0 for complete run)
+NITR  1                        # final cycle
+DATA  1000                     # desired number of structures per cycle (1+)
+
+#--- cycle 0 search
+aspc  1 2 3 4 
+npop  10 20 10 20
+
+#--- cycle 0 NN training
+mitr  10000 20000              # number of interations/training round
+tefs  0 1                      # type of training at each round
+
+#--- cycle 1+ search
+ASPC  1 2 3 4 5 6 7 8
+NPOP  20 40 20 40 20 40 20 40
+ITER  500                      # relaxation steps for NN-based search
+
+#--- cycle 1+ NN training
+MITR  10000 70000              # number of interations/training round
+TEFS  0 1                      # type of training at each round
+EXTR  6                        # extended force training factor when cycle = NITR
+
+#========================
+# OTHER SETTINGS 
+# (with their defaults)
+#========================
+
+#---  BASIC data
+LSYM  1                        # (1) symmetric box for REFS data (0) non-symmetric box
+
+#---  parameters for EVOS runs
+PGPA  0.0 10.0 30.0 50.0       # pressure values for EVOS data generation
+PWGT  1.0 0.5  0.25 0.25       # weights for pressure values (times the population size)
+AEOS  1                        # (1) EOSN data generation from unique minima; (0) no EOSN
+ATST  1                        # (1) TESTT data generation from NN MODEL TEST; (0) no TEST           
+SORT  1                        # (1) pressure-based and (0) cycle-based data collection
+ngen  2                        # number of evolutionary generations in cycle 0
+
+#---  additional DFT settings
+SORB  0                        # (0) no spin-orbit; non-zero = LMAXMIX value
+SYMP  1.0E-8                   # VASP SYMPREC; with zero value this will be truned off!
+
+#---  evolutionary search parameters (for EVOS runs)
+TETR  0.00                     # random using tetris
+PLNT  0.00                     # seeded
+PACK  0.00                     # biased
+BLOB  0.00                     # random using blob shape
+MATE  0.70                     # crossover using two halves
+SWAP  0.00                     # crossover using core-shell
+RUBE  0.00                     # Rubik's cube operation
+REFL  0.00                     # symmetrization via reflection
+INVS  0.00                     # symmetrization via inversion
+CHOP  0.00                     # chop to make facets
+MUTE  0.30                     # distortion
+MCRS  0.50                     # mutation rate in crossover
+SCRS  0.10                     # crossover:  swapping rate
+LCRS  0.10                     # crossover:  mutation strength for lattice vectors
+ACRS  0.10                     # crossover:  mutation strength for atomic positions
+SDST  0.10                     # distortion: swapping rate
+LDST  0.15                     # distortion: mutation strength for lattice vectors
+ADST  0.15                     # distortion: mutation strength for atomic positions
+ELPS  0.15                     # random:     nanoparticle ellipticity
+
+#---  variables for TEST run
+TMIN  5                        # number of minima per run
+TNGN  10                       # number of ES generation
+TNPP  10                       # population size of ES

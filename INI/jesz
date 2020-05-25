@@ -1,0 +1,53 @@
+#!/bin/bash
+#SBATCH -p long,main
+#SBATCH -n 16
+#SBATCH -N 1-1
+#SBATCH --mem-per-cpu=MaxMemPerCPU
+
+cd $SLURM_SUBMIT_DIR
+
+# path to VASP executable
+EXE=/opt/ohpc/pub/apps/VASP/vasp.5.4.4/bin/vasp_std
+
+
+#============================ DO NOT CHANGE FROM HERE
+
+
+cd EVOS/GGGG/MMMM/
+date -d now +%s > stamp
+
+cp ../../../INI/POTCAR   .
+cp ../../../INI/INCAR    .
+cp ../../../INI/maisenet_kmsh.py  .
+
+python maisenet_kmsh.py KKKK
+
+sed -i 's/NSW=0/NSW=WWWW/' INCAR
+mpirun $EXE  > out
+
+mv POSCAR    POSCAR.2
+mv CONTCAR   CONTCAR.2
+mv OUTCAR    OUTCAR.2
+mv OSZICAR   OSZICAR.2
+cp CONTCAR.2 POSCAR
+
+cp INCAR incar
+cp KPOINTS kpoints
+
+#kmesh
+#prec0
+#encut0
+#prec1
+#encut1
+
+sed -i 's/NSW=WWWW/NSW=0/' INCAR
+mpirun $EXE  > out
+
+mv POSCAR    POSCAR.1
+mv CONTCAR   CONTCAR.1
+mv OUTCAR    OUTCAR.1
+mv OSZICAR   OSZICAR.1
+
+rm IB* EI* PC* XD* CH* WA* vasp* DO* maisenet_kmsh.py
+
+cd ../../..

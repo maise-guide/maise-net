@@ -1,0 +1,55 @@
+=============================================================================================================
+                                        JOB/MODEL types
+=============================================================================================================
+JOBT  10                evolutionary search  (10) run  (11) soft exit  (12) hard exit (13) analysis
+=============================================================================================================
+                               STRUCTURE/DESCRIPTOR/NN parameters
+=============================================================================================================
+NMAX  40                max number of atoms
+MMAX  1000               max number of neighbors within cutoff radius
+NSPC  ZZZZ           number of species types
+TSPC  TTTT              speceis types
+ASPC  BBBB              atom number of each species in evolutionary searches
+=============================================================================================================
+                               EVOLUTIONARY SEARCH settings
+=============================================================================================================
+CODE  1                 (0) MAISE-INT (1) VASP-EXT (2) MAISE-EXT
+QUET  HHHH           (0) torque (1) slurm
+
+NDIM  DDDD              (3) crystal (2) film (0) particle
+LBOX  XXXX              box size for particle calculations (ignored for crystals)
+NPOP  MMMM              population size
+SITR  0                 starting iteration (0) start from random or specified structures
+NITR  GGGG              number of iterations
+TINI  0                 starting options if SITR=0
+TIME  10000             max time per relaxation
+PGPA  PPPP              pressure in GPa
+DENE  0.020             store distinct structures in POOL within this energy/atom window
+
+TETR  VV01              random using tetris
+PLNT  VV02              seeded
+PACK  VV03              biased
+BLOB  VV04              random using blob shape
+MATE  VV05              crossover using two halves
+SWAP  VV06              crossover using core-shell
+RUBE  VV07              Rubik's cube operation
+REFL  VV08              symmetrization via reflection
+INVS  VV09              symmetrization via inversion
+CHOP  VV10              chop to make facets
+MUTE  VV11              distortion
+
+MCRS  VV12              mutation rate in crossover
+SCRS  VV13              crossover:  swapping rate
+LCRS  VV14              crossover:  mutation strength for lattice vectors
+ACRS  VV15              crossover:  mutation strength for atomic positions
+SDST  VV16              distortion: swapping rate
+LDST  VV17              distortion: mutation strength for lattice vectors
+ADST  VV18              distortion: mutation strength for atomic positions
+ELPS  VV19              random:     nanoparticle ellipticity
+
+=============================================================================================================
+                                      INITIAL SEED
+=============================================================================================================
+SEED  5                 starting seed for the random number generator - 0 uses time as seed
+
+=============================================================================================================

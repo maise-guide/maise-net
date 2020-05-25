@@ -1,0 +1,60 @@
+                                                               
+
+                         maise-net                               
+                                                             
+                  Python interface to maise                     
+     for automated neural network potential construction
+                                                                
+                                                                
+              version 1.0.00   03/02/2020                    
+                                                                
+                          ====                              
+                                                                
+        With any use of this script, please cite:              
+     
+   "MAISE: Construction of neural network interatomic 
+    models and evolutionary structure optimization"
+
+                          ====                              
+                                                                
+               Questions and bug reports:                   
+                                                                
+        Samad  Hajinazar         hajinazar@binghamton.edu       
+        Alexey Kolmogorov        kolmogorov@binghamton.edu      
+                                                                
+                          ====                              
+                                                                
+                    HOW-TO and NOTES                          
+                                                                
+ 1) This wrapper is developed for automated dataset generation  
+    with MAISE and VASP codes for neural network potentials.    
+    It generates: single atom reference data (REFS), 2-4 atoms      
+    clusters (CLST), equation of state for high-symmetry  
+    structures (EOSZ), and evolutionary datasets of bulk or      
+    nanoparticle structures with a set of arbitrary sizes as    
+    defined in "setup" (EVOS). Optionally, EOSN (EOS data for
+    the unique minima in EVOS data) and TEST (DFT relaxation
+    for NN-based minima found in the test evolutionary search)
+    data can be generated, as well.                                  
+                                                                
+ 2) maise-net works with any out-of-the-box version of the Python  
+    (2.X/3.X) and does not need any non-standard module.        
+                                                                
+ 3) Local optimizations and energy calculations are performed   
+    with VASP package. VASP should be already installed on      
+    user's system with "vasp" executable in the system path.    
+                                                                
+ 4) "maise" executive and proper "POTCAR" for the system        
+    should be provided in the local INI/ directory.             
+                                                                
+ 5) Following files are job related and cluster specific;       
+    their header should be manually adjusted in the indicated   
+    part of the scripts, while the type of the cluster is       
+    defined in the "setup" file with QUET flag:                 
+                                                                
+     INI/jesz     for EVO run in cycle 0                            
+     INI/jesn     for EVO run in cycles 1+                           
+     INI/jdft     for DFT runs                                  
+     INI/jtrn     for training jobs                             
+     INI/jeos     for DFT runs in EOS and TST runs              
+                                                                

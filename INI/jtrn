@@ -1,0 +1,29 @@
+#!/bin/bash
+#SBATCH -p best
+#SBATCH -n 32
+#SBATCH --mem-per-cpu=MaxMemPerCPU
+#SBATCH -N 1-1
+
+cd $SLURM_SUBMIT_DIR
+
+
+
+#--- set this value to ~1.5 times the number of cores (16 -> 24)
+cores=32
+
+
+
+
+
+#============================ DO NOT CHANGE FROM HERE
+
+rm -rf energy_errors.dat error.dat out.dat enthal_errors.dat higher_errors.dat
+
+sed -i "s/QQQQ/$cores/" setup
+
+date >> id
+maise
+date >> id
+
+
+date > stamp
