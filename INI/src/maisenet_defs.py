@@ -11,10 +11,10 @@
 #                                                                #
 #         With any use of this script, please cite:              #
 #                                                                #
-#         'Stratified construction of neural network based       #
-#          interatomic models for multicomponent materials'      #
+#         'MAISE: Construction of neural network interatomic     #
+#             models and evolutionary structure optimization'    #
 #                                                                #
-#          DOI: 10.1103/PhysRevB.95.014114                       #
+#         arXiv:2005.12131                                       #
 #                                                                #
 #                             -----                              #
 #                                                                #
