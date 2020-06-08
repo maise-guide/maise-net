@@ -126,18 +126,20 @@ cmaxz  = 2.0                      # fraction of minz
 cnumb  = 50                       # number of cluster per size
 
 # TST run parameters
-tstmins  = 5                      # max number of minima for DFT run
-tstiter  = 500                    # NN optimization steps in NN-ES
-tstngen  = 10                     # number of generations for NN-ES
-tstnpop  = 10                     # population size for NN-ES
-tstpgpa  = [0.0,10.0,30.0]        # pressure values for NN-ES
-tstpwgt  = [1.0, 1.0, 1.0]        # weights for pressure values
-tst1ASPC = [2,4,8]                # atom/cell for elemental search
-tst2ASPC = [1,1,2,3,1,3,2,3,5,4]  # atom/cell for binary search (element 1)
-tst2BSPC = [1,2,1,1,3,2,3,5,3,4]  # atom/cell for binary search (element 2)
-tst3ASPC = [1,1,2,1,2,1,2]        # atom/cell for ternary search (element 1)
-tst3BSPC = [1,1,1,2,2,2,1]        # atom/cell for ternary search (element 2)
-tst3CSPC = [1,2,1,1,1,2,2]        # atom/cell for ternary search (element 3)
+tstmins  = 5                               # max number of minima for DFT run
+tstiter  = 500                             # NN optimization steps in NN-ES
+tstnpop  = 16                              # population size for NN-ES
+tstpgpa  = [0.0,10.0,30.0]                 # pressure values for NN-ES
+tstpwgt  = [1.0, 1.0, 1.0]                 # weights for pressure values
+tst1ASPC = [2,4,8]                         # atom/cell for elemental search
+tstngen1 = [25,25,25]                      # number of generations for NN-ES
+tst2ASPC = [1,1,2,3,1,3,2,2,6,4]           # atom/cell for binary search (element 1)
+tst2BSPC = [1,2,1,1,3,2,3,6,2,4]           # atom/cell for binary search (element 2)
+tstngen2 = [25,25,25,25,25,25,25,25,25,25] # number of generations for NN-ES
+tst3ASPC = [1,1,2,1,2,1,2]                 # atom/cell for ternary search (element 1)
+tst3BSPC = [1,1,1,2,2,2,1]                 # atom/cell for ternary search (element 2)
+tst3CSPC = [1,2,1,1,1,2,2]                 # atom/cell for ternary search (element 3)
+tstngen3 = [25,25,25,25,25,25,25]          # number of generations for NN-ES
 
 # ======================================================================================           
 # Physical constants and values
@@ -210,6 +212,7 @@ class setup:
         self.ATST       = 1                     # (1) Active-TST data generation from NN MODEL TEST; (0) non Active-TST
         self.SORT       = 1                     # (1) pressure-based and (0) cycle-based data collection
         self.NPAR       = 8                     # number of cores used for parsing and maise runs
+        self.RPAR       = 1                     # number of cores for NN relaxation jobs
         self.NSYM       = 51                    # number of symmetry function components
         self.RCUT       = 1                     # cut-off radius
         self.FMRK       = 0.5                   # fraction of atoms selected for force training
@@ -275,15 +278,15 @@ class setup:
         self.EXTR       = 1                     # extended training: times number of steps for the last cycle
         self.ERNI       = 0                     # resume flag; for Erneso!
         # variables for TST run; have defaults defined above!
-        self.TSTA       = []                    # number of atoms species A
-        self.TSTB       = []                    # number of atoms species B
-        self.TSTC       = []                    # number of atoms species C
-        self.TGPA       = []                    # pressures for ES run
-        self.TPWT       = []                    # weight for pressures in ES runs
-        self.TMIN       = 0                     # number of minima per run
+        self.TSTA       = []                    # list of number of atoms species A
+        self.TSTB       = []                    # list of number of atoms species B
+        self.TSTC       = []                    # list of number of atoms species C
+        self.TGPA       = []                    # list of pressures for ES run
+        self.TPWT       = []                    # list of weight for pressures in ES runs
+        self.TMIN       = 0                     # number of minima per run for DFT
         self.TITR       = 0                     # number of NN-relaxation steps
-        self.TNGN       = 0                     # number of ES generation
-        self.TNPP       = 0                     # population size of ES
+        self.TNGN       = []                    # list of number of generations per run
+        self.TNPP       = 0                     # number of members per population (will be resclaed with weights)
         # internals: set and used inside the code
         #----------------------------------------
         self.NSPC       = 0                     # total number of species in the run

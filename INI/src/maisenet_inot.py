@@ -49,8 +49,6 @@ def import_stp(fname): # Read the data generation setup
                     struc.TMIN = int(singl)
                 if "TITR" == flag:
                     struc.TITR = int(singl)
-                if "TNGN" == flag:
-                    struc.TNGN = int(singl)
                 if "TNPP" == flag:
                     struc.TNPP = int(singl)
                 if "JOBT" == flag:
@@ -79,6 +77,8 @@ def import_stp(fname): # Read the data generation setup
                     struc.SMLR = int(singl)
                 if "NPAR" == flag:
                     struc.NPAR = int(singl)
+                if "RPAR" == flag:
+                    struc.RPAR = int(singl)
                 if "NSYM" == flag:
                     struc.NSYM = int(singl)
                 if "RCUT" == flag:
@@ -166,6 +166,8 @@ def import_stp(fname): # Read the data generation setup
                 if "PREC" == flag:
                     struc.PREC = singl
                 # int lists
+                if "TNGN" == flag:
+                    struc.TNGN = list(map(int,multi))
                 if "TSTA" == flag:
                     struc.TSTA = list(map(int,multi))
                 if "TSTB" == flag:

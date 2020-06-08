@@ -93,7 +93,7 @@ def submit_esj(cwd, inidir, datdir, mindir, run, fileout, estype, i, z, cyc, set
           duplicates(cwd+"/"+inidir+"/maise",run+"/INI/NNET/maise-nnet")
           duplicates(cwd+"/model",run+"/INI/NNET")
           replacestr(run+"/INI/NNET/setup","PPPP",str(setup_0.PGPA[z]))
-          replacestr(run+"/INI/NNET/setup","QQQQ",str(setup_0.NPAR))
+          replacestr(run+"/INI/NNET/setup","QQQQ",str(setup_0.RPAR))
           replacestr(run+"/INI/NNET/setup","GGGG",str(setup_0.ISIF))
           replacestr(run+"/INI/NNET/setup","DDDD",str(setup_0.NDIM))
           replacestr(run+"/INI/NNET/setup","OOOO",str(setup_0.ITER))
@@ -799,12 +799,17 @@ def initit_stp(RUN, inidir, output, setup_0): # Check initial directories; and i
      # initiate TEST run variables
      if setup_0.TMIN == 0:
           setup_0.TMIN = tstmins
-     if setup_0.TITR == 0:
-          setup_0.TITR = tstiter
-     if setup_0.TNGN == 0:
-          setup_0.TNGN = tstngen
      if setup_0.TNPP == 0:
           setup_0.TNPP = tstnpop
+     if setup_0.TITR == 0:
+          setup_0.TITR = tstiter
+     if len(setup_0.TNGN) == 0 or (not type(setup_0.TNGN) is list):
+          if setup_0.NSPC == 1:
+               setup_0.TNGN = tstngen1[:]
+          if setup_0.NSPC == 2:
+               setup_0.TNGN = tstngen2[:]
+          if setup_0.NSPC == 3:
+               setup_0.TNGN = tstngen3[:]
      if len(setup_0.TGPA) == 0 or (not type(setup_0.TGPA) is list):
           setup_0.TGPA = tstpgpa[:]
      if len(setup_0.TPWT) == 0 or (not type(setup_0.TPWT) is list):

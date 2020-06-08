@@ -30,6 +30,7 @@ kdns  4000
 LREG  1e-8                     # regularization
 NNNU  10 10                    # number of neurons in hidden layers
 NNGT  1  1                     # activation function type for hidden layers
+RPAR  1                        # number of cores for NN relaxation jobs
 
 #--- parsing parameters
 NPAR  8                        # number of cores used for parsing
@@ -110,6 +111,12 @@ ADST  0.15                     # distortion: mutation strength for atomic positi
 ELPS  0.15                     # random:     nanoparticle ellipticity
 
 #---  variables for TEST run
-TMIN  5                        # number of minima per run
-TNGN  10                       # number of ES generation
-TNPP  10                       # population size of ES
+#TSTA       # list of number of atoms species A
+#TSTB       # list of number of atoms species B
+#TSTC       # list of number of atoms species C
+#TMIN       # number of minima per run for DFT
+#TITR       # number of NN-relaxation steps
+#TGPA       # list of pressures
+#TPWT       # list of weights for pressures in ES runs
+#TNGN       # list of number of generations per run
+#TNPP       # number of members per population (will be resclaed with weights)

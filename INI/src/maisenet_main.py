@@ -883,7 +883,6 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
      t_setup.PGPA  = t_setup.TGPA[:]
      t_setup.PWGT  = t_setup.TPWT[:]
      t_setup.ITER  = t_setup.TITR
-     t_setup.NGEN  = t_setup.TNGN
      t_setup.PNUM  = len(t_setup.TGPA)
 
      # ===== starting the task
@@ -895,6 +894,7 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
      for z in range(0,t_setup.PNUM):
           PRESSU = format(z,"02d")
           for i in range(0,len(t_setup.SIZN)):
+               t_setup.NGEN  = t_setup.TNGN[i]
                MAXJ   = reread_stp(fileout,cwd+"/setup")
                POPULN = format(i,"02d")
                SRCDIR = srcdir+PRESSU+"/"+POPULN  # always indexed as: EVO/cycle/pressure/population
@@ -929,7 +929,14 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
                     if does__exst(mindir+"P"+CYCLES+tag+m):
                          run = DATDIR+"/"+m+"000"
                          mkdir_tree(run)
-                         duplicates(mindir+"P"+CYCLES+tag+m,run+"/POSCAR")
+                         # try to symmetrize structures before the DFT runs!
+                         duplicates(mindir+"P"+CYCLES+tag+m,"POSCAR")
+                         os.system("./"+mini_+"/maise -spg 0.1 1000 |tail -n 1 > tmpspg")
+                         if file_nthln("tmpspg",0) == "":
+                              duplicates(mindir+"P"+CYCLES+tag+m,run+"/POSCAR")
+                         else:
+                              duplicates("CONV",run+"/POSCAR")
+                         removes_fd("POSCAR CONV PRIM str.cif tmpspg")
                          duplicates(cwd+"/"+mini_+"/INCAR", run)
                          replacestr(run+"/INCAR","PPPP",str(t_setup.PGPA[int(z)]*10.0))
                          replacestr(run+"/INCAR","AAAA",str(t_setup.PREC))
