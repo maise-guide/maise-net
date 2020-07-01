@@ -718,6 +718,11 @@ def similr_chk(cwd, inidir, mindir, datdir, fileout, cyc, jobfile, NM, MINIMA, s
      export_out(fileout, "Note: similarity check is finished: % 4d structures rejected from % 4d (cycle = % 4d)" % (nrej, NM, cyc),color = 2)
      MAXJ = reread_stp(fileout,cwd+"/setup")
 
+     if totwgt > 0.0:
+          return (1.0/totwgt)
+     else:
+          export_out(fileout,"Error: similarity check failed!",color = 1);exit()
+
 #----------------------------------------------------------------------------------                
 
 def initit_stp(RUN, inidir, output, setup_0): # Check initial directories; and initiate the required variables for runs

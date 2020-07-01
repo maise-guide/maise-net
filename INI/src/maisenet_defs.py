@@ -126,16 +126,16 @@ cmaxz  = 2.0                      # fraction of minz
 cnumb  = 50                       # number of cluster per size
 
 # TST run parameters
-tstmins  = 5                               # max number of minima for DFT run
+tstmins  = 10                              # max number of minima for DFT run
 tstiter  = 500                             # NN optimization steps in NN-ES
 tstnpop  = 16                              # population size for NN-ES
 tstpgpa  = [0.0,10.0,30.0]                 # pressure values for NN-ES
 tstpwgt  = [1.0, 1.0, 1.0]                 # weights for pressure values
 tst1ASPC = [2,4,8]                         # atom/cell for elemental search
 tstngen1 = [25,25,25]                      # number of generations for NN-ES
-tst2ASPC = [1,1,2,3,1,3,2,2,6,4]           # atom/cell for binary search (element 1)
-tst2BSPC = [1,2,1,1,3,2,3,6,2,4]           # atom/cell for binary search (element 2)
-tstngen2 = [25,25,25,25,25,25,25,25,25,25] # number of generations for NN-ES
+tst2ASPC = [1,1,2,3,1,3,2,3,5,4,2,6]             # atom/cell for binary search (element 1)
+tst2BSPC = [1,2,1,1,3,2,3,5,3,4,6,2]             # atom/cell for binary search (element 2)
+tstngen2 = [25,25,25,25,25,25,25,25,25,25,25,25] # number of generations for NN-ES
 tst3ASPC = [1,1,2,1,2,1,2]                 # atom/cell for ternary search (element 1)
 tst3BSPC = [1,1,1,2,2,2,1]                 # atom/cell for ternary search (element 2)
 tst3CSPC = [1,2,1,1,1,2,2]                 # atom/cell for ternary search (element 3)

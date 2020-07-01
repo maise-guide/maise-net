@@ -669,7 +669,7 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                export_out(fileout,"Note: no similarity check is performed: all % 5d minima are marked as unique" % (minima1+minima2),color = 2)
 
           if m_setup.SMLR == 1: # DFT relax and assign weights accordingly
-               similr_chk(cwd,mini_,mindir,datdir,fileout,cyc,"jdft",NM,MINIMA,m_setup)
+              norm = similr_chk(cwd,mini_,mindir,datdir,fileout,cyc,"jdft",NM,MINIMA,m_setup)
 
           minima = 0
           for i in range(0,NM):
@@ -755,20 +755,20 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
 
           # submit AEOS runs for unique minima of the current cycle (if any)
           if m_setup.AEOS == 1:
-               (NM,direc,files) = searchfile(mmin_,"P"+CYCLES+"*")
                for j in range(0,NM):
                     MAXJ = reread_stp(fileout,cwd+"/setup")
-                    C    = files[j][1:3]
-                    P    = files[j][3:5]
-                    R    = files[j][5:7]
-                    I    = files[j][7:10]
+                    fi   = list(MINIMA.keys())[j]
+                    C    = fi[1:3]
+                    P    = fi[3:5]
+                    R    = fi[5:7]
+                    I    = fi[7:10]
                     if SORT == 1:
                          run = datdir+devo_+P+R+"/"+C+"/"+I+"00r"
                     if SORT == 2:
                          run = datdir+devo_+P+"/"+C+"/"+R+"/"+I+"00r"
                     if SORT == 0:
                          run = datdir+devo_+"/"+P+"/"+C+"/"+R+"/"+I+"00r"
-                    if does__exst(run+"/dat.dat"):
+                    if abs(norm-MINIMA[fi]) < 1.0e-3:
                          eosdir = cwd+"/"+meos_+"/"+daes_+format(cyc,"02d")+"/"+C+P+R+I+"/"
                          mkdir_tree(eosdir)
                          duplicates(run+"/CONTCAR.0",eosdir+"/POSCAR"+str(setup_0.NSPC)+C+P+R+I)

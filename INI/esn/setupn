@@ -24,7 +24,7 @@ NITR  GGGG              number of iterations
 TINI  0                 starting options if SITR=0
 TIME  10000             max time per relaxation
 PGPA  PPPP              pressure in GPa
-DENE  10.0              store distinct structures in POOL within this energy/atom window
+DENE  30.0              store distinct structures in POOL within this energy/atom window
 SCUT  0.98
 
 TETR  VV01              random using tetris
