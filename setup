@@ -46,6 +46,7 @@ FMRK  0.5                      # ratio of atomic forces for training
 SITR  0                        # start from this cycle (0 for complete run)
 NITR  1                        # final cycle
 DATA  1000                     # desired number of structures per cycle (1+)
+WAIT  0                        # (1) wait for DFT runs to be copied by user; (0) submit DFT runs
 
 #--- cycle 0 search
 aspc  1 2 3 4 
@@ -61,9 +62,9 @@ NPOP  20 40 20 40 20 40 20 40
 ITER  500                      # relaxation steps for NN-based search
 
 #--- cycle 1+ NN training
-MITR  10000 70000              # number of interations/training round
+MITR  5000 60000               # number of interations/training round
 TEFS  0 1                      # type of training at each round
-EXTR  6                        # extended force training factor when cycle = NITR
+EXTR  2                        # extended force training factor when cycle = NITR
 
 #========================
 # OTHER SETTINGS 

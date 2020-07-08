@@ -6,7 +6,7 @@
 #                for automated data generation                   #
 #                                                                #
 #                                                                #
-#                 version 1.0.04   07/01/2020                    # 
+#                 version 1.0.05   07/08/2020                    # 
 #                                                                #
 #                             -----                              #
 #                                                                #
@@ -79,7 +79,7 @@ from maisenet_task  import initit_stp
 # Output file name
 output = mout_
 
-export_hdr(output,"version 1.0.04   07/01/2020")
+export_hdr(output,"version 1.0.05   07/08/2020")
 
 if not os.path.exists("setup"):
      export_out(output,"Error: setup file does not exist",color = 1);exit()

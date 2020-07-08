@@ -47,7 +47,7 @@ def DATGEN_REF(RUN, output, setup_0): # REF DATA GENERATION
 
      cwd = os.getcwd()
      fileout = cwd+"/"+output
-     export_out(fileout,"\n                      ===== running in %s mode =====\n" % runt,time = 0,color = 2)
+     export_out(fileout,"\n                      ===== running in %s mode =====\n" % runt,time = 0,color = 3)
 
      # default values of NDIM=0, KDNS=0, ISIF=2,PSTRESS=0.0 are enforced
      l_setup.SIGM          = defsigma
@@ -68,29 +68,29 @@ def DATGEN_REF(RUN, output, setup_0): # REF DATA GENERATION
      else:
           pos.LATT = [[l_setup.LBOX*0.95,0,0],[0,l_setup.LBOX,0],[0,0,l_setup.LBOX*1.05]]
 
-     if setup_0.ERNI == 1 and does__exst(datdir):
-          export_out(fileout,"           Skipping... % s" % datdir,time = 0,color = 2)
+     if l_setup.ERNI == 1 and does__exst(datdir):
+          export_out(fileout,"           Skipping... % s" % datdir,time = 0,color = 3)
           return
 
      if l_setup.LBOX == 0.0:
-          export_out(fileout,"Error: LBOX value can not be zero for reference structures",color = 1);exit()
+          export_out(fileout,"Error: LBOX value can not be zero for reference structures",color = 2);exit()
      if does__exst(datdir):
-          export_out(fileout,"Error: % s directory already exists" % datdir,color = 1);exit()
+          export_out(fileout,"Error: % s directory already exists" % datdir,color = 2);exit()
 
      # ===== starting the task
 
-     MAXJ = reread_stp(fileout,cwd+"/setup")
+     reread_stp(fileout,l_setup,cwd+"/setup")
 
-     export_out(fileout,"Note: generating %s dataset" % runt ,color = 2)
+     export_out(fileout,"Note: generating %s dataset" % runt ,color = 3)
 
-     export_out(fileout,"Note: a small SIGMA of % 5.3lf will be used for the %s data generation" % (l_setup.SIGM,runt),color = 2)
+     export_out(fileout,"Note: a small SIGMA of % 5.3lf will be used for the %s data generation" % (l_setup.SIGM,runt),color = 3)
 
      # submit DFT runs
      run = datdir+"00/"
      mkdir_tree(run)
      export_str(pos,run+"/POSCAR")
      (N,direc,fies) = searchfile(datdir,"POSCAR")
-     export_out(fileout,"Note: submitting % 5d DFT runs for %s dataset at % s..." % (N,runt,datdir),color = 2)
+     export_out(fileout,"Note: submitting % 5d DFT runs for %s dataset at % s..." % (N,runt,datdir),color = 3)
      submit_dft(cwd,mini_,datdir,fileout,"jdft",l_setup)
 
      for j in range(1,rnumb):
@@ -101,7 +101,7 @@ def DATGEN_REF(RUN, output, setup_0): # REF DATA GENERATION
      duplicates(cwd+"/"+mini_+"/"+iprs_+"/tag-ref",datdir+"/tag")
 
      (N,direc,files) = searchfile(datdir+dref_+"*","POSCAR.0")
-     export_out(fileout,"Note: %s data generation is all done! total % 5d DFT structure are generated in % s" % (runt,N,datdir),color = 2)
+     export_out(fileout,"Note: %s data generation is all done! total % 5d DFT structure are generated in % s" % (runt,N,datdir),color = 3)
 
 #----------------------------------------------------------------------------------
 
@@ -137,9 +137,9 @@ def DATGEN_EOS(RUN, output, cyc, setup_0): # EOS DATA GENERATION
           eosdir = cwd+"/"+meos_+"/"+deos_+"00"+"/"  # path to the optimized prototypes
 
      if RUN == JBAS:
-          export_out(fileout,"\n                      ===== running in %s mode =====\n" % runt,time = 0,color = 2)
+          export_out(fileout,"\n                      ===== running in %s mode =====\n" % runt,time = 0,color = 3)
 
-     export_out(fileout,"Note: generating %s dataset" % runt,color = 2)
+     export_out(fileout,"Note: generating %s dataset" % runt,color = 3)
 
      # ===== starting the task
 
@@ -151,20 +151,20 @@ def DATGEN_EOS(RUN, output, cyc, setup_0): # EOS DATA GENERATION
      # prepare and submit DFT runs for prototypes for BASICS
      if RUN == JBAS:
           num    = enumb
-          export_out(fileout,"Note: optimizing %s prototypes ..." % runt,color = 2)
-          MAXJ = reread_stp(fileout,cwd+"/setup")
+          export_out(fileout,"Note: optimizing %s prototypes ..." % runt,color = 3)
+          reread_stp(fileout,x_setup,cwd+"/setup")
 
           (N,direc,files) = searchfile(srcdir,"POSCAR"+str(x_setup.NSPC)+"*")
           if N == 0:
-               export_out(fileout,"Error: no POSCAR prototype for this system exists in % s" % srcdir,color = 1);exit()
+               export_out(fileout,"Error: no POSCAR prototype for this system exists in % s" % srcdir,color = 2);exit()
 
           for i in range(0,N):
                tag = files[i].replace("POSCAR"+str(x_setup.NSPC),"")
                run = eosdir+tag
                if does__exst(run) and x_setup.ERNI == 0:
-                    export_out(fileout,"Error: % s directory already exists" % run,color = 1);exit()
+                    export_out(fileout,"Error: % s directory already exists" % run,color = 2);exit()
                if does__exst(run) and x_setup.ERNI == 1:
-                    export_out(fileout,"           Skipping... % s" % run,time = 0,color = 2)
+                    export_out(fileout,"           Skipping... % s" % run,time = 0,color = 3)
                     continue
                mkdir_tree(run)
                duplicates(direc[i]+"/"+files[i],run+"/POSCAR")
@@ -212,7 +212,7 @@ def DATGEN_EOS(RUN, output, cyc, setup_0): # EOS DATA GENERATION
 
      # collect prototypes, generate EOS structures, and submit DFT runs
      for i in range(0,N):
-          MAXJ = reread_stp(fileout,cwd+"/setup")
+          reread_stp(fileout,x_setup,cwd+"/setup")
           tag  = files[i].replace("POSCAR"+str(x_setup.NSPC),"")
           if RUN != JBAS:
                cle =  tag[0:2]
@@ -221,18 +221,18 @@ def DATGEN_EOS(RUN, output, cyc, setup_0): # EOS DATA GENERATION
                siz =  tag[6:len(tag)]
 
           if doesntexst(eosdir+tag+"/CONTCAR.0"):
-               export_out(fileout,"Error: the file %s does not exist" % (eosdir+tag+"/CONTCAR.0"),color = 1);exit()
+               export_out(fileout,"Error: the file %s does not exist" % (eosdir+tag+"/CONTCAR.0"),color = 2);exit()
           if (SORT == 1 or SORT == 2) and does__exst(datdir+deos_+tag):
                if x_setup.ERNI == 0:
-                    export_out(fileout,"Error: % s directory already exists" % (datdir+deos_+tag),color = 1);exit()
+                    export_out(fileout,"Error: % s directory already exists" % (datdir+deos_+tag),color = 2);exit()
                else:
-                    export_out(fileout,"           Skipping... % s" % (datdir+deos_+tag),time = 0,color = 2)
+                    export_out(fileout,"           Skipping... % s" % (datdir+deos_+tag),time = 0,color = 3)
                     continue
           if SORT == 0 and does__exst(datdir+deos_+"/"+tag):
                if x_setup.ERNI == 0:
-                    export_out(fileout,"Error: % s directory already exists" % (datdir+deos_+"/"+tag),color = 1);exit()
+                    export_out(fileout,"Error: % s directory already exists" % (datdir+deos_+"/"+tag),color = 2);exit()
                else:
-                    export_out(fileout,"           Skipping... % s" % (datdir+deos_+"/"+tag),time = 0,color = 2)
+                    export_out(fileout,"           Skipping... % s" % (datdir+deos_+"/"+tag),time = 0,color = 3)
                     continue
           for j in range(0,num+1):
                lbl = format(j,"02d")
@@ -303,17 +303,17 @@ def DATGEN_EOS(RUN, output, cyc, setup_0): # EOS DATA GENERATION
 
      if RUN != JBAS:
           (N,direc,fies) = searchfile(datdir+daes_+"*","POSCAR")
-          export_out(fileout,"Note: submitting % 5d DFT runs for %s dataset at % s..." % (N,runt,datdir+daes_+"*"),color = 2)
+          export_out(fileout,"Note: submitting % 5d DFT runs for %s dataset at % s..." % (N,runt,datdir+daes_+"*"),color = 3)
           if N > 0:
                N = submit_dft(cwd,mini_,datdir+daes_+"*",fileout,"jdft",x_setup)
 
      if RUN == JBAS:
           (N,direc,fies) = searchfile(datdir+deos_+"*","POSCAR")
-          export_out(fileout,"Note: submitting % 5d DFT runs for %s dataset at % s..." % (N,runt,datdir+deos_+"*"),color = 2)
+          export_out(fileout,"Note: submitting % 5d DFT runs for %s dataset at % s..." % (N,runt,datdir+deos_+"*"),color = 3)
           if N > 0:
                N = submit_dft(cwd,mini_,datdir+deos_+"*",fileout,"jdft",x_setup)
           (N,direc,fies) = searchfile(datdir+deos_+"*","POSCAR.0")
-          export_out(fileout,"Note: %s data generation is all done! total % 5d DFT structure are generated in % s" % (runt,N,datdir+deos_+"*"),color = 2)
+          export_out(fileout,"Note: %s data generation is all done! total % 5d DFT structure are generated in % s" % (runt,N,datdir+deos_+"*"),color = 3)
 
 #----------------------------------------------------------------------------------
 
@@ -333,7 +333,7 @@ def DATGEN_CLS(RUN, output, setup_0): # CLST DATA GENERATION
 
      cwd = os.getcwd()
      fileout = cwd+"/"+output
-     export_out(fileout,"\n                      ===== running in %s mode =====\n" % runt,time = 0,color = 2)
+     export_out(fileout,"\n                      ===== running in %s mode =====\n" % runt,time = 0,color = 3)
 
      # default values of KDNS=0,ISIF=2,PSTRESS=0.0 are enforced
      z_setup.KDNS    = 0
@@ -348,41 +348,41 @@ def DATGEN_CLS(RUN, output, setup_0): # CLST DATA GENERATION
      delta  = (max_z-min_z)/float(num)
 
      if z_setup.LBOX == 0.0:
-          export_out(fileout,"Error: LBOX value can not be zero for clusters",color = 1);exit()
+          export_out(fileout,"Error: LBOX value can not be zero for clusters",color = 2);exit()
 
      # ===== starting the task
 
-     export_out(fileout,"Note: generating %s dataset" % runt,color = 2)
-     export_out(fileout,"Note: a small SIGMA of % 5.3lf will be used for the %s data generation" % (z_setup.SIGM,runt),color = 2)
+     export_out(fileout,"Note: generating %s dataset" % runt,color = 3)
+     export_out(fileout,"Note: a small SIGMA of % 5.3lf will be used for the %s data generation" % (z_setup.SIGM,runt),color = 3)
 
 
      if SORT == 1 or SORT == 0:
           if does__exst(datdir+dcls_):
                if z_setup.ERNI == 0:
-                    export_out(fileout,"Error: % s directory already exists" % (datdir+dcls_),color = 1);exit()
+                    export_out(fileout,"Error: % s directory already exists" % (datdir+dcls_),color = 2);exit()
                else:
-                    export_out(fileout,"           Skipping... % s" % (datdir+dcls_),time = 0,color = 2)
+                    export_out(fileout,"           Skipping... % s" % (datdir+dcls_),time = 0,color = 3)
                     return
 
      if SORT == 2:
           if z_setup.NSPC < 3:
                if does__exst(datdir+dcls_+"02") or does__exst(datdir+dcls_+"04"):
                     if z_setup.ERNI == 0:
-                         export_out(fileout,"Error: % s directory already exists" % (datdir+dcls_+"0*"),color = 1);exit()
+                         export_out(fileout,"Error: % s directory already exists" % (datdir+dcls_+"0*"),color = 2);exit()
                     else:
-                         export_out(fileout,"           Skipping... % s" % (datdir+dcls_+"0*"),time = 0,color = 2)
+                         export_out(fileout,"           Skipping... % s" % (datdir+dcls_+"0*"),time = 0,color = 3)
                          return
           if z_setup.NSPC == 3:
                if does__exst(datdir+dcls_+"03"):
                     if z_setup.ERNI == 0:
-                         export_out(fileout,"Error: % s directory already exists" % (datdir+dcls_+"0*"),color = 1);exit()
+                         export_out(fileout,"Error: % s directory already exists" % (datdir+dcls_+"0*"),color = 2);exit()
                     else:
-                      export_out(fileout,"           Skipping... % s" % (datdir+dcls_+"0*"),time = 0,color = 2)
+                      export_out(fileout,"           Skipping... % s" % (datdir+dcls_+"0*"),time = 0,color = 3)
                       return
 
      # prepare CLST structures of 2- and 4- atoms, and submit DFT runs
      for i in range(0,num+1):
-          MAXJ = reread_stp(fileout,cwd+"/setup")
+          reread_stp(fileout,z_setup,cwd+"/setup")
           tag = format(i,"02d")
           pos            = poscar()
           pos.COOR       = 1
@@ -443,11 +443,11 @@ def DATGEN_CLS(RUN, output, setup_0): # CLST DATA GENERATION
                duplicates(cwd+"/"+mini_+"/"+iprs_+"/tag-cls",datdir+dcls_+"03/tag")
 
      (N,direc,fies) = searchfile(datdir+dcls_+"*","POSCAR")
-     export_out(fileout,"Note: submitting % 5d DFT runs for %s dataset at % s..." % (N,runt,datdir+dcls_+"*"),color = 2)
+     export_out(fileout,"Note: submitting % 5d DFT runs for %s dataset at % s..." % (N,runt,datdir+dcls_+"*"),color = 3)
      submit_dft(cwd,mini_,datdir+dcls_+"*",fileout,"jdft",z_setup)
 
      (N,direc,files) = searchfile(datdir+dcls_+"*","POSCAR.0")
-     export_out(fileout,"Note: %s data generation is all done! total % 5d DFT structure are generated in % s" % (runt,N,datdir+dcls_+"*"),color = 2)
+     export_out(fileout,"Note: %s data generation is all done! total % 5d DFT structure are generated in % s" % (runt,N,datdir+dcls_+"*"),color = 3)
 
 #----------------------------------------------------------------------------------
 
@@ -465,7 +465,7 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
 
      cwd = os.getcwd()
      fileout = cwd+"/"+output
-     export_out(fileout,"\n                      ===== running in %s mode =====\n" % runt,time = 0,color = 2)
+     export_out(fileout,"\n                      ===== running in %s mode =====\n" % runt,time = 0,color = 3)
 
      datdir = cwd+"/"+mdat_+"/"             # path to collected DFT data of the cycle for parsing
      srcdir = cwd+"/"+mevo_+"/"+CYCLES+"/"  # path to NN evolution runs
@@ -475,11 +475,11 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
      model  = cwd+"/model"
 
      if does__exst(srcdir):
-          export_out(fileout,"Error: % s already exists" % srcdir,color = 1);exit()
+          export_out(fileout,"Error: % s already exists" % srcdir,color = 2);exit()
      if does__exst(prsdir):
-          export_out(fileout,"Error: % s already exists" % prsdir,color = 1);exit()
+          export_out(fileout,"Error: % s already exists" % prsdir,color = 2);exit()
      if does__exst(libdir):
-          export_out(fileout,"Error: % s already exists" % libdir,color = 1);exit()
+          export_out(fileout,"Error: % s already exists" % libdir,color = 2);exit()
 
      # ===== starting the task
 
@@ -487,12 +487,12 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
      if cyc == 0:
 
           if does__exst(mindir):
-               export_out(fileout,"Error: % s already exists" % mindir,color = 1);exit()
+               export_out(fileout,"Error: % s already exists" % mindir,color = 2);exit()
 
           mkdir_tree(mindir)
 
           # prepare and submit ES runs for CYCLE 0 dataset
-          export_out(fileout,"Note: generating %s dataset in cycle = % 3d" % (runt,cyc),color = 2)
+          export_out(fileout,"Note: generating %s dataset in cycle = % 3d" % (runt,cyc),color = 3)
 
           permin = []
           for i in range(0,m_setup.PNUM):
@@ -502,7 +502,7 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
           for z in range(0,m_setup.PNUM):
                PRESSU = format(z,"02d")
                for i in range(0,len(m_setup.SIZ0)):
-                    MAXJ    = reread_stp(fileout,cwd+"/setup")
+                    reread_stp(fileout,m_setup,cwd+"/setup")
                     POPULN  = format(i,"02d")
                     SRCDIR  = srcdir+"/"+PRESSU+"/"+POPULN  # always indexed as: EVO/cycle/pressure/population
                     if SORT == 1:
@@ -512,13 +512,13 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                     if SORT == 0:
                          DATDIR = datdir+devo_+"/"+PRESSU+"/"+CYCLES # indexed as: DAT/"evo/"pressure/cycle/population
                     if does__exst(DATDIR):
-                         export_out(fileout,"Error: % s already exists" % DATDIR,color = 1);exit()
+                         export_out(fileout,"Error: % s already exists" % DATDIR,color = 2);exit()
                     popsize = int(round(m_setup.npop[i]*m_setup.PWGT[z]))
                     pop     = submit_esj(cwd,mini_,DATDIR,mindir,SRCDIR,fileout,iesz_,i,z,cyc,m_setup)
                     totmin    += pop
                     permin[z] += pop
 
-          export_out(fileout,"Note: collected % 5d ES-minima in cycle = % 3d" % (totmin,cyc),color = 2)
+          export_out(fileout,"Note: collected % 5d ES-minima in cycle = % 3d" % (totmin,cyc),color = 3)
           for i in range(0,m_setup.PNUM):
                export_out(fileout,"        pressure % 6.2lf  ES-minima % 5d (cycle = % 3d)" %(m_setup.PGPA[i],permin[i],cyc),time = 0)
 
@@ -554,13 +554,13 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
 
           if SORT == 1:
                (N,direc,files) = searchfile(datdir+devo_+"*/"+CYCLES,"POSCAR.0")
-               export_out(fileout,"Note: %s data generation in cycle % d is all done! total % 5d DFT structure are generated in % s" % (runt,cyc,N,datdir+devo_+"*/"+CYCLES),color = 2)
+               export_out(fileout,"Note: %s data generation in cycle % d is all done! total % 5d DFT structure are generated in % s" % (runt,cyc,N,datdir+devo_+"*/"+CYCLES),color = 3)
           if SORT == 2:
                (N,direc,files) = searchfile(datdir+devo_+"*/"+CYCLES,"POSCAR.0")
-               export_out(fileout,"Note: %s data generation in cycle % d is all done! total % 5d DFT structure are generated in % s" % (runt,cyc,N,datdir+devo_+"*/"+CYCLES),color = 2)
+               export_out(fileout,"Note: %s data generation in cycle % d is all done! total % 5d DFT structure are generated in % s" % (runt,cyc,N,datdir+devo_+"*/"+CYCLES),color = 3)
           if SORT == 0:
                (N,direc,files) = searchfile(datdir+devo_+"/*/"+CYCLES,"POSCAR.0")
-               export_out(fileout,"Note: %s data generation in cycle % d is all done! total % 5d DFT structure are generated in % s" % (runt,cyc,N,datdir+devo_+"/*/"+CYCLES),color = 2)
+               export_out(fileout,"Note: %s data generation in cycle % d is all done! total % 5d DFT structure are generated in % s" % (runt,cyc,N,datdir+devo_+"/*/"+CYCLES),color = 3)
 
      # ===== CYCLE n DATA GENERATION                     
      if cyc > 0:
@@ -571,10 +571,10 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                if does__exst(cwd+"/"+mlib_+"/"+format(cyc-1, "02d")+"/model"):
                     duplicates(cwd+"/"+mlib_+"/"+format(cyc-1, "02d")+"/model",cwd+"/model")
                else:
-                    export_out(fileout,"Error: the neural network model does not exist at % s or % s " % (model,mlib_+"/"+format(cyc-1,"02d")),color = 1);exit()
+                    export_out(fileout,"Error: the neural network model does not exist at % s or % s " % (model,mlib_+"/"+format(cyc-1,"02d")),color = 2);exit()
 
           if doesntexst(mindir):
-               export_out(fileout,"Error: the %s directory does not exist" % (mindir),color = 1);exit()
+               export_out(fileout,"Error: the %s directory does not exist" % (mindir),color = 2);exit()
 
           permin = []
           for i in range(0,m_setup.PNUM):
@@ -582,12 +582,12 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
           totmin  = 0
 
           # prepare and submit ES runs for CYCLE 1+ dataset
-          export_out(fileout,"Note: generating %s dataset in cycle = % 3d" % (runt,cyc),color = 2)
+          export_out(fileout,"Note: generating %s dataset in cycle = % 3d" % (runt,cyc),color = 3)
 
           for z in range(0,m_setup.PNUM):
                PRESSU = format(z,"02d")
                for i in range(0,len(m_setup.SIZN)):
-                    MAXJ    = reread_stp(fileout,cwd+"/setup")
+                    reread_stp(fileout,m_setup,cwd+"/setup")
                     POPULN  = format(i,"02d")
                     SRCDIR  = srcdir+"/"+PRESSU+"/"+POPULN  # always indexed as: EVO/cycle/pressure/population
                     if SORT == 1:
@@ -597,13 +597,13 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                     if SORT == 0:
                          DATDIR = datdir+devo_+"/"+PRESSU+"/"+CYCLES # indexed as: DAT/"evo"pressure/cycle/population
                     if does__exst(DATDIR):
-                         export_out(fileout,"Error: % s already exists" % DATDIR,color = 1);exit()
+                         export_out(fileout,"Error: % s already exists" % DATDIR,color = 2);exit()
                     popsize = int(round(m_setup.NPOP[i]*m_setup.PWGT[z]))
                     pop     = submit_esj(cwd,mini_,DATDIR,mindir,SRCDIR,fileout,iesn_,i,z,cyc,m_setup)
                     totmin    += pop
                     permin[z] += pop
 
-          export_out(fileout,"Note: collected % 5d ES-minima in cycle = % 3d" % (totmin,cyc),color = 2)
+          export_out(fileout,"Note: collected % 5d ES-minima in cycle = % 3d" % (totmin,cyc),color = 3)
           for i in range(0,m_setup.PNUM):
                export_out(fileout,"        pressure % 6.2lf  ES-minima % 5d (cycle = % 3d)" %(m_setup.PGPA[i],permin[i],cyc),time = 0)
 
@@ -644,11 +644,11 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                     addstrfile(run+"/INCAR",l)
 
           if SORT == 1:
-               export_out(fileout,"Note: submitting % 5d DFT runs for minima of %s dataset at % s..." % (NM,runt,datdir+devo_+"*/"+CYCLES),color = 2)
+               export_out(fileout,"Note: submitting % 5d DFT runs for minima of %s dataset at % s..." % (NM,runt,datdir+devo_+"*/"+CYCLES),color = 3)
           if SORT == 2:
-               export_out(fileout,"Note: submitting % 5d DFT runs for minima of %s dataset at % s..." % (NM,runt,datdir+devo_+"*/"+CYCLES),color = 2)
+               export_out(fileout,"Note: submitting % 5d DFT runs for minima of %s dataset at % s..." % (NM,runt,datdir+devo_+"*/"+CYCLES),color = 3)
           if SORT == 0:
-               export_out(fileout,"Note: submitting % 5d DFT runs for minima of %s dataset at % s..." % (NM,runt,datdir+devo_+"/*/"+CYCLES),color = 2)
+               export_out(fileout,"Note: submitting % 5d DFT runs for minima of %s dataset at % s..." % (NM,runt,datdir+devo_+"/*/"+CYCLES),color = 3)
 
           submit_dft(cwd,mini_,datdir+devo_+"*",fileout,"jdft",m_setup)
 
@@ -661,12 +661,13 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
 
           mwegt = [] 
           (NM,mdi,mfi) = searchfile(cwd+"/"+mmin_,"P"+CYCLES+"*")
+          norm = 1.0/float(NM)
           for i in range(0,NM):
-               mwegt.append(1.0/float(NM))
+               mwegt.append(norm)
           MINIMA = dict(zip(mfi,mwegt)) # list of minima and their weights
 
           if m_setup.SMLR == 0: # no check is performed
-               export_out(fileout,"Note: no similarity check is performed: all % 5d minima are marked as unique" % (minima1+minima2),color = 2)
+               export_out(fileout,"Note: no similarity check is performed: all % 5d minima are marked as unique" % (minima1+minima2),color = 3)
 
           if m_setup.SMLR == 1: # DFT relax and assign weights accordingly
               norm = similr_chk(cwd,mini_,mindir,datdir,fileout,cyc,"jdft",NM,MINIMA,m_setup)
@@ -681,7 +682,7 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
           else:
                WEGT = m_setup.DATA - minima
           trajmin = 0
-          export_out(fileout,"Note: sampling relaxation path (for target % 5d structures) in cycle = % 3d ..." % (WEGT,cyc),color = 2)
+          export_out(fileout,"Note: sampling relaxation path (for target % 5d structures) in cycle = % 3d ..." % (WEGT,cyc),color = 3)
           for i in range(0,NM):
                fi  = list(MINIMA.keys())[i]
                C   = fi[1:3]
@@ -692,7 +693,7 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                wegt    = int(round(WEGT * MINIMA[fi]))
                trajtmp = 0
                if wegt > 0:
-                    MAXJ = reread_stp(fileout,cwd+"/setup")
+                    reread_stp(fileout,m_setup,cwd+"/setup")
                     (o,N,POSCARS) = readoutcar(S+"/OUTCAR.1")
                     delta = int(round((N-1)/(wegt+1)))
                     if wegt >= N or delta == 0: # if there is no enough struc to sample; do all
@@ -727,36 +728,40 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                     persam[int(fi[3:5])] += trajtmp
                export_out(fileout,"          sampled % 5d structures from %s weight % 5.3lf (%s)" % (trajtmp,fi,MINIMA[fi],S),time = 0)
 
-          export_out(fileout,"Note: collected % 5d relaxation path structures from % 5d unique-minima in cycle = % 3d" % (trajmin,minima,cyc),color = 2)
+          export_out(fileout,"Note: collected % 5d relaxation path structures from % 5d unique-minima in cycle = % 3d" % (trajmin,minima,cyc),color = 3)
           for i in range(0,m_setup.PNUM):
                export_out(fileout,"        pressure % 6.2lf  unique-minima % 5d  sampled % 5d (cycle = % 3d)" %(m_setup.PGPA[i],permin[i],persam[i],cyc),time = 0)
 
           os.chdir(cwd)
 
           # submit DFT runs
+          wait = m_setup.WAIT
+          if m_setup.WAIT == 1:
+               m_setup.WAIT = 9 # submit_dft will do the "wait" only if setup.WAIT == 9 (but for user it should be set to 1)!
           if SORT == 1:
                (N,direc,fies) = searchfile(datdir+devo_+"*/"+CYCLES,"POSCAR")
-               export_out(fileout,"Note: submitting % 5d DFT runs for relaxation path of %s dataset at % s..." % (N,runt,datdir+devo_+"*/"+CYCLES),color = 2)
+               export_out(fileout,"Note: submitting % 5d DFT runs for relaxation path of %s dataset at % s..." % (N,runt,datdir+devo_+"*/"+CYCLES),color = 3)
                submit_dft(cwd,mini_,datdir+devo_+"*/"+CYCLES,fileout,"jdft",m_setup)
                (N1,direc,files) = searchfile(datdir+devo_+"*/"+CYCLES,"POSCAR.0")
-               export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (runt,cyc,N1,datdir+devo_+"*/"+CYCLES),color = 2)
+               export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (runt,cyc,N1,datdir+devo_+"*/"+CYCLES),color = 3)
           if SORT == 2:
                (N,direc,fies) = searchfile(datdir+devo_+"*/"+CYCLES,"POSCAR")
-               export_out(fileout,"Note: submitting % 5d DFT runs for relaxation path of %s dataset at % s..." % (N,runt,datdir+devo_+"*/"+CYCLES),color = 2)
+               export_out(fileout,"Note: submitting % 5d DFT runs for relaxation path of %s dataset at % s..." % (N,runt,datdir+devo_+"*/"+CYCLES),color = 3)
                submit_dft(cwd,mini_,datdir+devo_+"*/"+CYCLES,fileout,"jdft",m_setup)
                (N1,direc,files) = searchfile(datdir+devo_+"*/"+CYCLES,"POSCAR.0")
-               export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (runt,cyc,N1,datdir+devo_+"*/"+CYCLES),color = 2)
+               export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (runt,cyc,N1,datdir+devo_+"*/"+CYCLES),color = 3)
           if SORT == 0:
                (N,direc,fies) = searchfile(datdir+devo_+"/*/"+CYCLES,"POSCAR")
-               export_out(fileout,"Note: submitting % 5d DFT runs for relaxation path of %s dataset at % s..." % (N,runt,datdir+devo_+"/*/"+CYCLES),color = 2)
+               export_out(fileout,"Note: submitting % 5d DFT runs for relaxation path of %s dataset at % s..." % (N,runt,datdir+devo_+"/*/"+CYCLES),color = 3)
                submit_dft(cwd,mini_,datdir+devo_+"/*/"+CYCLES,fileout,"jdft",m_setup)
                (N1,direc,files) = searchfile(datdir+devo_+"/*/"+CYCLES,"POSCAR.0")
-               export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (runt,cyc,N1,datdir+devo_+"/*/"+CYCLES),color = 2)
-
+               export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (runt,cyc,N1,datdir+devo_+"/*/"+CYCLES),color = 3)
+          m_setup.WAIT = wait
           # submit AEOS runs for unique minima of the current cycle (if any)
           if m_setup.AEOS == 1:
+               (NM,mdi,mfi) = searchfile(cwd+"/"+mmin_,"P"+CYCLES+"*")
                for j in range(0,NM):
-                    MAXJ = reread_stp(fileout,cwd+"/setup")
+                    reread_stp(fileout,m_setup,cwd+"/setup")
                     fi   = list(MINIMA.keys())[j]
                     C    = fi[1:3]
                     P    = fi[3:5]
@@ -771,7 +776,7 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                     if abs(norm-MINIMA[fi]) < 1.0e-3:
                          eosdir = cwd+"/"+meos_+"/"+daes_+format(cyc,"02d")+"/"+C+P+R+I+"/"
                          mkdir_tree(eosdir)
-                         duplicates(run+"/CONTCAR.0",eosdir+"/POSCAR"+str(setup_0.NSPC)+C+P+R+I)
+                         duplicates(run+"/CONTCAR.0",eosdir+"/POSCAR"+str(m_setup.NSPC)+C+P+R+I)
                          duplicates(run+"/CONTCAR.0",eosdir)
                          duplicates(run+"/POSCAR.0", eosdir)
                          duplicates(run+"/OUTCAR.0", eosdir)
@@ -779,10 +784,10 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                DATGEN_EOS(RUN,output,cyc,m_setup)
                if SORT == 1:
                     (N2,direc,files) = searchfile(datdir+daes_+"*/"+CYCLES,"POSCAR.0")
-                    export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (daes_.upper(),cyc,N2,datdir+daes_+"*/"+CYCLES),color = 2)
+                    export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (daes_.upper(),cyc,N2,datdir+daes_+"*/"+CYCLES),color = 3)
                if SORT == 2 or SORT == 0:
                     (N2,direc,files) = searchfile(datdir+daes_+"/*/"+CYCLES,"POSCAR.0")
-                    export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (daes_.upper(),cyc,N2,datdir+daes_+"/*/"+CYCLES),color = 2)
+                    export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (daes_.upper(),cyc,N2,datdir+daes_+"/*/"+CYCLES),color = 3)
 
           # parsing the new set of the structures
           submit_prs(cwd,mini_,datdir,prsdir,fileout,cyc,m_setup)
@@ -791,7 +796,7 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
           submit_trn(cwd,mini_,libdir,prsdir,fileout,"jtrn",cyc,m_setup)
 
           # TEST data generation (if any)
-          MAXJ = reread_stp(fileout,cwd+"/setup")
+          reread_stp(fileout,m_setup,cwd+"/setup")
           DATGEN_TST(RUN,output,cyc,1,m_setup)
           if m_setup.ATST == 1: # collect TEST data if ATST run!
                if does__exst(mtst_+"/"+CYCLES+"/"+dtst_):
@@ -808,12 +813,12 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
 
                if SORT == 1 or SORT == 2:
                     (N3,direc,files) = searchfile(datdir+dtst_+"*/"+CYCLES,"POSCAR.0")
-                    export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (dtst_.upper(),cyc,N3,datdir+dtst_+"*/"+CYCLES),color = 2)
+                    export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (dtst_.upper(),cyc,N3,datdir+dtst_+"*/"+CYCLES),color = 3)
                if SORT == 0:
                     (N3,direc,files) = searchfile(datdir+dtst_+"/*/"+CYCLES,"POSCAR.0")
-                    export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (dtst_.upper(),cyc,N3,datdir+dtst_+"/*/"+CYCLES),color = 2)
+                    export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (dtst_.upper(),cyc,N3,datdir+dtst_+"/*/"+CYCLES),color = 3)
 
-          export_out(fileout,"Note: data generations in cycle % d is completed with total % 5d DFT structures (% 5d %s, % 5d %s, % 5d %s)" % (cyc,N1+N2+N3,N1,runt,N2,daes_.upper(),N3,dtst_.upper()),color = 2)
+          export_out(fileout,"Note: data generations in cycle % d is completed with total % 5d DFT structures (% 5d %s, % 5d %s, % 5d %s)" % (cyc,N1+N2+N3,N1,runt,N2,daes_.upper(),N3,dtst_.upper()),color = 3)
 
 #----------------------------------------------------------------------------------
 
@@ -832,7 +837,7 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
      cwd = os.getcwd()
      fileout = cwd+"/"+output
 
-     export_out(fileout,"\n                      ===== running in %s mode =====\n" % runt ,time = 0,color = 2)
+     export_out(fileout,"\n                      ===== running in %s mode =====\n" % runt ,time = 0,color = 3)
 
      CYCLES  = format(cyc,"02d")
 
@@ -844,9 +849,9 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
      model   = cwd+"/model"
 
      if does__exst(basdir):
-          export_out(fileout,"Error: % s already exists" % basdir,color = 1);exit()
+          export_out(fileout,"Error: % s already exists" % basdir,color = 2);exit()
      if doesntexst(model):
-          export_out(fileout,"Error: % s does not exist" % model,color = 1);exit()
+          export_out(fileout,"Error: % s does not exist" % model,color = 2);exit()
 
      # initialize the variables according to the number of species
      if t_setup.NSPC == 1:
@@ -888,14 +893,14 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
      # ===== starting the task
 
      # prepare and submit ES runs for TEST run
-     export_out(fileout,"Note: generating %s dataset in cycle % 3d ..." % (runt,cyc),color = 2)
+     export_out(fileout,"Note: generating %s dataset in cycle % 3d ..." % (runt,cyc),color = 3)
      totmin  = 0
      mkdir_tree(mindir)
      for z in range(0,t_setup.PNUM):
           PRESSU = format(z,"02d")
           for i in range(0,len(t_setup.SIZN)):
                t_setup.NGEN  = t_setup.TNGN[i]
-               MAXJ   = reread_stp(fileout,cwd+"/setup")
+               reread_stp(fileout,t_setup,cwd+"/setup")
                POPULN = format(i,"02d")
                SRCDIR = srcdir+PRESSU+"/"+POPULN  # always indexed as: EVO/cycle/pressure/population
                if SORT == 1:
@@ -907,15 +912,15 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
                pop    = submit_esj(cwd,mini_,DATDIR,mindir,SRCDIR,fileout,iesn_,i,z,cyc,t_setup)
                totmin += pop
 
-     export_out(fileout,"Note: collected % 4d minima in %s run" % (totmin,runt),color = 2)
+     export_out(fileout,"Note: collected % 4d minima in %s run" % (totmin,runt),color = 3)
           
      # submit DFT runs for "t_setup.TMIN" lowest NN-minima
      (NM,mdi,mfi) = searchfile(mindir,"P*")
-     export_out(fileout,"Note: submitting % 5d DFT runs for selected NN minima of %s run at % s..." % (NM,runt,datdir),color = 2)
+     export_out(fileout,"Note: submitting % 5d DFT runs for selected NN minima of %s run at % s..." % (NM,runt,datdir),color = 3)
      for z in range(0,t_setup.PNUM):
           PRESSU = format(z,"02d")
           for i in range(0,len(t_setup.SIZN)):
-               MAXJ   = reread_stp(fileout,cwd+"/setup")
+               reread_stp(fileout,t_setup,cwd+"/setup")
                POPULN = format(i,"02d")
                if SORT == 1:
                     DATDIR = datdir+devo_+PRESSU+POPULN+"/"+CYCLES # indexed as: DAT/"evo"pressure"population"/cycle
@@ -1001,7 +1006,7 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
                          pos = import_str(mindir+"P"+CYCLES+tag+m)
                          voleN.append(float(volume_str(pos)/float(pos.NATM)))
                          clrsN.append(j)
-                         adrsN.append(src.replace(basdir,""))
+                         adrsN.append(src.replace(mtst_+"/"+CYCLES+"/",""))
                     run = DATDIR+"/"+m+"000"
                     if does__exst(run+"/OUTCAR.0"):
                          duplicates(run+"/CONTCAR.0","POSCAR")
@@ -1037,9 +1042,11 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
                composition += str(t_setup.SPCN[t_setup.NSPC-1][i])
 
                for j in range(0,len(enerN)):
-                    r = ranks[j]
-                    export_out(fileout," % 8s  % 5.1lf  % 5s  % 5s  % 10.3lf %s % 10.4lf %s  %s % 10.4lf %s  % 10.3lf  % 5s  % 5s    % 25s  % 25s" % (composition,t_setup.PGPA[z],spg1N[j],spg2N[j],voleN[j],COLOR_CODES[j],enerN[j],COLOR_CODES[0],COLOR_CODES[r],enerD[r],COLOR_CODES[0],voleD[r],spg1D[r],spg2D[r],adrsN[j],adrsD[r]),time = 0)
-                    export_out(testout," % 8s  % 5.1lf  % 5s  % 5s  % 10.3lf %s % 10.4lf %s  %s % 10.4lf %s  % 10.3lf  % 5s  % 5s    % 25s  % 25s" % (composition,t_setup.PGPA[z],spg1N[j],spg2N[j],voleN[j],COLOR_CODES[j],enerN[j],COLOR_CODES[0],COLOR_CODES[r],enerD[r],COLOR_CODES[0],voleD[r],spg1D[r],spg2D[r],adrsN[j],adrsD[r]),time = 0)
+                    r  = ranks[j]
+                    cN = j+1 # color for ANN structure
+                    cD = r+1 # color for DFT structure
+                    export_out(fileout," % 8s  % 5.1lf  % 5s  % 5s  % 10.3lf %s % 10.4lf %s  %s % 10.4lf %s  % 10.3lf  % 5s  % 5s    % 25s  % 25s" % (composition,t_setup.PGPA[z],spg1N[j],spg2N[j],voleN[j],COLOR_CODES[cN],enerN[j],COLOR_CODES[0],COLOR_CODES[cD],enerD[r],COLOR_CODES[0],voleD[r],spg1D[r],spg2D[r],adrsN[j],adrsD[r]),time = 0)
+                    export_out(testout," % 8s  % 5.1lf  % 5s  % 5s  % 10.3lf %s % 10.4lf %s  %s % 10.4lf %s  % 10.3lf  % 5s  % 5s    % 25s  % 25s" % (composition,t_setup.PGPA[z],spg1N[j],spg2N[j],voleN[j],COLOR_CODES[cN],enerN[j],COLOR_CODES[0],COLOR_CODES[cD],enerD[r],COLOR_CODES[0],voleD[r],spg1D[r],spg2D[r],adrsN[j],adrsD[r]),time = 0)
 
                export_out(fileout,"-------------------------------------------------------------------------------------------",time = 0)
                export_out(testout,"-------------------------------------------------------------------------------------------",time = 0)
@@ -1056,6 +1063,6 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
                               duplicates(basdir+adrsD[r]+"/POSCAR.1",atstdir+"/POSCAR.0")
                               duplicates(cwd+"/"+mini_+"/"+iprs_+"/tag-tst",cwd+"/"+mtst_+"/"+CYCLES+"/"+dtst_+"/"+dtst_+PRESSU+POPULN+"/tag")
 
-     export_out(fileout,"Note: %s run for cycle % d is completed" % (runt,cyc),color = 2)
+     export_out(fileout,"Note: %s run for cycle % d is completed" % (runt,cyc),color = 3)
 
 #----------------------------------------------------------------------------------

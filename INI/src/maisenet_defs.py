@@ -158,11 +158,11 @@ Latom_symb = {1:"H",2:"He",3:"Li",4:"Be",5:"B",6:"C",7:"N",8:"O",9:"F",10:"Ne",1
 Lsymb_atom = {"H":1,"h":1,"He":2,"he":2,"Li":3,"li":3,"Be":4,"be":4,"B":5,"b":5,"C":6,"c":6,"N":7,"n":7,"O":8,"o":8,"F":9,"f":9,"Ne":10,"ne":10,"Na":11,"na":11,"Mg":12,"mg":12,"Al":13,"al":13,"Si":14,"si":14,"P":15,"p":15,"S":16,"s":16,"Cl":17,"cl":17,"Ar":18,"ar":18,"K":19,"k":19,"Ca":20,"ca":20,"Sc":21,"sc":21,"Ti":22,"ti":22,"V":23,"v":23,"Cr":24,"cr":24,"Mn":25,"mn":25,"Fe":26,"fe":26,"Co":27,"co":27,"Ni":28,"ni":28,"Cu":29,"cu":29,"Zn":30,"zn":30,"Ga":31,"ga":31,"Ge":32,"ge":32,"As":33,"as":33,"Se":34,"se":34,"Br":35,"br":35,"Kr":36,"kr":36,"Rb":37,"rb":37,"Sr":38,"sr":38,"Y":39,"y":39,"Zr":40,"zr":40,"Nb":41,"nb":41,"Mo":42,"mo":42,"Tc":43,"tc":43,"Ru":44,"ru":44,"Rh":45,"rh":45,"Pd":46,"pd":46,"Ag":47,"ag":47,"Cd":48,"cd":48,"In":49,"in":49,"Sn":50,"sn":50,"Sb":51,"sb":51,"Te":52,"te":52,"I":53,"i":53,"Xe":54,"xe":54,"Cs":55,"cs":55,"Ba":56,"ba":56,"La":57,"la":57,"Ce":58,"ce":58,"Pr":59,"pr":59,"Nd":60,"nd":60,"Pm":61,"pm":61,"Sm":62,"sm":62,"Eu":63,"eu":63,"Gd":64,"gd":64,"Tb":65,"tb":65,"Dy":66,"dy":66,"Ho":67,"ho":67,"Er":68,"er":68,"Tm":69,"tm":69,"Yb":70,"yb":70,"Lu":71,"lu":71,"Hf":72,"hf":72,"Ta":73,"ta":73,"W":74,"w":74,"Re":75,"re":75,"Os":76,"os":76,"Ir":77,"ir":77,"Pt":78,"pt":78,"Au":79,"au":79,"Hg":80,"hg":80,"Tl":81,"tl":81,"Pb":82,"pb":82,"Bi":83,"bi":83,"Po":84,"po":84,"At":85,"at":85,"Rn":86,"rn":86,"Fr":87,"fr":87,"Ra":88,"ra":88,"Ac":89,"ac":89,"Th":90,"th":90,"Pa":91,"pa":91,"U":92,"u":92,"Np":93,"np":93,"Pu":94,"pu":94,"Am":95,"am":95}
 
 # ======================================================================================           
-# Color codes (will be used in the code globally)
+# Color codes (ANSI ESCAPE CODES; will be used in the code globally)
 # ======================================================================================           
 
-# ordered as: red; green; yellow; blue; magenta; cyan
-COLOR_CODES = {0:"\033[0m",1:"\033[31m",2:"\033[32m",3:"\033[33m",4:"\033[34m",5:"\033[35m",6:"\033[36m",7:"\033[37m",8:"\033[31;1m",9:"\033[32;1m",10:"\033[33;1m",11:"\033[34;1m",12:"\033[35;1m",13:"\033[36;1m",14:"\033[37;1m"}
+# ordered as: white; red; green; yellow; blue; magenta; cyan (bold) --- same sequence (normal)
+COLOR_CODES = {0:"\033[0m",1:"\033[1;37m",2:"\033[1;31m",3:"\033[1;32m",4:"\033[1;33m",5:"\033[1;34m",6:"\033[1;35m",7:"\033[1;36m",8:"\033[0;37m",9:"\033[0;31m",10:"\033[0;32m",11:"\033[0;33m",12:"\033[0;34m",13:"\033[0;35m",14:"\033[0;36m"}
 
 # ======================================================================================           
 # POSCAR data class
@@ -272,6 +272,8 @@ class setup:
         self.PWGT       = [1.0,0.5,0.25,0.25]   # weight for each pressure value (X population size)
         self.SORB       = 0                     # (0) no spin-orbit; non-zero = LMAXMIX value!
         self.SYMP       = 1.0E-8                # the SYMPREC flag in VASP; with zero value this will be truned off!
+        self.WAIT       = 0                     # (1) waits for DFT runs instead of submitting them!
+        self.MAIL       = ""                    # email address to which a "wait" message will be sent!
         # model training
         self.MITR       = []                    # number of interations/training steps (1+ cycle)
         self.TEFS       = []                    # type of training at each step (1+ cycle)

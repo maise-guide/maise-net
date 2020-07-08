@@ -43,6 +43,8 @@ def import_stp(fname): # Read the data generation setup
                 multi = s[1:]    # input source for variables which are list
                 singl = multi[0] # input source for variables with single value
                 # int vars
+                if "WAIT" == flag:
+                    struc.WAIT = int(singl)
                 if "TMIN" == flag:
                     struc.TMIN = int(singl)
                 if "TMIN" == flag:
@@ -161,6 +163,8 @@ def import_stp(fname): # Read the data generation setup
                 if "ECUT" == flag:
                     struc.ECUT = float(singl)
                 # string vars
+                if "MAIL" == flag:
+                    struc.MAIL = singl
                 if "prec" == flag:
                     struc.prec = singl
                 if "PREC" == flag:
@@ -218,17 +222,18 @@ def import_stp(fname): # Read the data generation setup
 
 #----------------------------------------------------------------------------------    
 
-def reread_stp(fileout, fname): # Re-reads setup file for data generation; quits for JOBT=89 or returns MAXJ; pause for JOBT=88 
+def reread_stp(fileout, setup, fname): # Re-reads setup file for data generation; quits for JOBT=89; pause for JOBT=88 
     s = import_stp(fname)
     if s.JOBT%10 == JPSE:
-        export_out(fileout,"Note: pausing ...",color = 2)
+        export_out(fileout,"Note: pausing ...",color = 3)
         while s.JOBT%10 == JPSE:
             time.sleep(5)
             s = import_stp(fname)
-        export_out(fileout,"Note: resuming ...",color = 2)
+        export_out(fileout,"Note: resuming ...",color = 3)
     if s.JOBT%10 == JQTE:
-        export_out(fileout,"Note: terminating at user's request!",color = 2);exit()
-    return s.MAXJ
+        export_out(fileout,"Note: terminating at user's request!",color = 3);exit()
+    setup.MAXJ = s.MAXJ
+    setup.WAIT = s.WAIT
 
 #----------------------------------------------------------------------------------                
 
@@ -236,8 +241,8 @@ def export_out(fileout, message, time = 1, color = 0): # Write to the output fil
     f = open(fileout, "a")
     if time == 1:
         if color > 0:
-            f.write("%s % 20s > % s %s \n\n" % (COLOR_CODES[color],datetime.datetime.now().strftime("%m/%d/%Y %H:%M"),message,COLOR_CODES[0]))
-            print("%s % 20s > % s %s \n" % (COLOR_CODES[color],datetime.datetime.now().strftime("%m/%d/%Y %H:%M"),message,COLOR_CODES[0]))
+            f.write("% 20s > %s % s %s \n\n" % (datetime.datetime.now().strftime("%m/%d/%Y %H:%M"),COLOR_CODES[color],message,COLOR_CODES[0]))
+            print("% 20s > %s % s %s \n" % (datetime.datetime.now().strftime("%m/%d/%Y %H:%M"),COLOR_CODES[color],message,COLOR_CODES[0]))
         else:
             f.write(" % 20s > % s \n\n" % (datetime.datetime.now().strftime("%m/%d/%Y %H:%M"),message))
             print(" % 20s > % s \n" % (datetime.datetime.now().strftime("%m/%d/%Y %H:%M"),message))
@@ -346,7 +351,7 @@ def export_str(struc, fname): # Output the POSCAR structure
 def outcar_out(fileout, struc, dir_out):
 
     if doesntexst(dir_out):
-        export_out(fileout,"Error: target directory for OUTCAR (% s) does not exist" % (dir_file),color = 1);exit()
+        export_out(fileout,"Error: target directory for OUTCAR (% s) does not exist" % (dir_file),color = 2);exit()
     nion = struc.NATM
     vole = volume_str(struc)/float(nion)
     tene = struc.ENER
@@ -392,9 +397,9 @@ def outcar_out(fileout, struc, dir_out):
 
 def datdat_out(fileout, dir_file, dir_out): # Write (dir_out/dat.dat) file using (outcar with path: dir_file)
     if doesntexst(dir_file):
-        export_out(fileout,"Error: input OUTCAR file (% s) does not exist" % (dir_file),color = 1);exit()
+        export_out(fileout,"Error: input OUTCAR file (% s) does not exist" % (dir_file),color = 2);exit()
     if doesntexst(dir_out):
-        export_out(fileout,"Error: target directory for dat.dat (% s) does not exist" % (dir_file),color = 1);exit()
+        export_out(fileout,"Error: target directory for dat.dat (% s) does not exist" % (dir_file),color = 2);exit()
 
     f= open(dir_file,"r")
     O=f.read().split("\n")
@@ -454,7 +459,7 @@ def datdat_out(fileout, dir_file, dir_out): # Write (dir_out/dat.dat) file using
 def datdat_str(fileout, struc, dir_out): # Write (dir_out/dat.dat) file using a "struc" class
 
     if doesntexst(dir_out):
-        export_out(fileout,"Error: target directory for dat.dat (% s) does not exist" % (dir_file),color = 1);exit()
+        export_out(fileout,"Error: target directory for dat.dat (% s) does not exist" % (dir_file),color = 2);exit()
 
     nion = struc.NATM
     vole = volume_str(struc)/float(nion)
@@ -706,33 +711,33 @@ def export_hdr(output, ver): # Output the header of the script
     fileout = cwd+"/"+output
 
     if doesntexst(fileout):
-        export_out(fileout,"      #================================================================#",time = 0,color = 2)
-        export_out(fileout,"      #                                                                #",time = 0,color = 2)
-        export_out(fileout,"      #                            maise-net                           #",time = 0,color = 2)
-        export_out(fileout,"      #                                                                #",time = 0,color = 2)
-        export_out(fileout,"      #                    Python interface to maise                   #",time = 0,color = 2)
-        export_out(fileout,"      #                  for automated data generation                 #",time = 0,color = 2)
-        export_out(fileout,"      #                                                                #",time = 0,color = 2)
-        export_out(fileout,"      #"+int(round((64.0-len(ver))/2.0))*" "+ver+(64-int(round((64.0-len(ver))/2.0))-len(ver))*" "+"#",time = 0,color = 2)             
-        export_out(fileout,"      #                                                                #",time = 0,color = 2)
-        export_out(fileout,"      #                             -----                              #",time = 0,color = 2)
-        export_out(fileout,"      #                                                                #",time = 0,color = 2)
-        export_out(fileout,"      #         With any use of this script, please cite:              #",time = 0,color = 2)
-        export_out(fileout,"      #                                                                #",time = 0,color = 2)
-        export_out(fileout,"      #         'Stratified construction of neural network based       #",time = 0,color = 2)
-        export_out(fileout,"      #          interatomic models for multicomponent materials'      #",time = 0,color = 2)
-        export_out(fileout,"      #                                                                #",time = 0,color = 2)
-        export_out(fileout,"      #          DOI: 10.1103/PhysRevB.95.014114                       #",time = 0,color = 2)
-        export_out(fileout,"      #                                                                #",time = 0,color = 2)
-        export_out(fileout,"      #                             -----                              #",time = 0,color = 2)
-        export_out(fileout,"      #                                                                #",time = 0,color = 2)
-        export_out(fileout,"      #                   Questions and bug reports:                   #",time = 0,color = 2)
-        export_out(fileout,"      #                                                                #",time = 0,color = 2)
-        export_out(fileout,"      #        Samad  Hajinazar         hajinazar@binghamton.edu       #",time = 0,color = 2)
-        export_out(fileout,"      #        Alexey Kolmogorov        kolmogorov@binghamton.edu      #",time = 0,color = 2)
-        export_out(fileout,"      #                                                                #",time = 0,color = 2)
-        export_out(fileout,"      #================================================================#",time = 0,color = 2)
-        export_out(fileout,"                                                                        ",time = 0,color = 2)
+        export_out(fileout,"      #================================================================#",time = 0,color = 3)
+        export_out(fileout,"      #                                                                #",time = 0,color = 3)
+        export_out(fileout,"      #                            maise-net                           #",time = 0,color = 3)
+        export_out(fileout,"      #                                                                #",time = 0,color = 3)
+        export_out(fileout,"      #                    Python interface to maise                   #",time = 0,color = 3)
+        export_out(fileout,"      #                  for automated data generation                 #",time = 0,color = 3)
+        export_out(fileout,"      #                                                                #",time = 0,color = 3)
+        export_out(fileout,"      #"+int(round((64.0-len(ver))/2.0))*" "+ver+(64-int(round((64.0-len(ver))/2.0))-len(ver))*" "+"#",time = 0,color = 3)             
+        export_out(fileout,"      #                                                                #",time = 0,color = 3)
+        export_out(fileout,"      #                             -----                              #",time = 0,color = 3)
+        export_out(fileout,"      #                                                                #",time = 0,color = 3)
+        export_out(fileout,"      #         With any use of this script, please cite:              #",time = 0,color = 3)
+        export_out(fileout,"      #                                                                #",time = 0,color = 3)
+        export_out(fileout,"      #         'MAISE: Construction of neural network interatomic     #",time = 0,color = 3)
+        export_out(fileout,"      #             models and evolutionary structure optimization'    #",time = 0,color = 3)
+        export_out(fileout,"      #                                                                #",time = 0,color = 3)
+        export_out(fileout,"      #         arXiv:2005.12131                                       #",time = 0,color = 3)
+        export_out(fileout,"      #                                                                #",time = 0,color = 3)
+        export_out(fileout,"      #                             -----                              #",time = 0,color = 3)
+        export_out(fileout,"      #                                                                #",time = 0,color = 3)
+        export_out(fileout,"      #                   Questions and bug reports:                   #",time = 0,color = 3)
+        export_out(fileout,"      #                                                                #",time = 0,color = 3)
+        export_out(fileout,"      #        Samad  Hajinazar         hajinazar@binghamton.edu       #",time = 0,color = 3)
+        export_out(fileout,"      #        Alexey Kolmogorov        kolmogorov@binghamton.edu      #",time = 0,color = 3)
+        export_out(fileout,"      #                                                                #",time = 0,color = 3)
+        export_out(fileout,"      #================================================================#",time = 0,color = 3)
+        export_out(fileout,"                                                                        ",time = 0,color = 3)
 
 #----------------------------------------------------------------------------------                
 

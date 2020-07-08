@@ -214,28 +214,31 @@ def checks_dft(fname): # Checks an OUTCAR file to see if run is properly finishe
 
 #----------------------------------------------------------------------------------          
 def submit_dft(cwd, inidir, datdir, fileout, jobfile, setup_0): # Create a list of collected directories and submit DFT runs
+     
+    setup_t = setup() # tmp setup for this function
 
     isub = 0
     dsub = [] # keeps the list of directories that are submitted here
-    MAXJ = reread_stp(fileout,cwd+"/setup")
+    reread_stp(fileout,setup_t,cwd+"/setup")
 
     # number of new jobs to be submitted
     (N,direc,files) = searchfile(datdir,"POSCAR")
     nsub = [0  for i in range(N)] # will tag directories that are submitted here with 1 value
     jsub = ["" for i in range(N)] # will hold the jobid for those submitted here
     for j in range(0,N):
-        # check how many of those submitted are still running
-        irun = 0
-        for i in range(0,isub):
-            if doesntexst(dsub[i]+"/OUTCAR.0"):
-                irun += 1
-        while irun >= MAXJ:
-            irun = 0
-            for i in range(0,isub):
-                if doesntexst(dsub[i]+"/OUTCAR.0"):
-                    irun += 1
-            time.sleep(5)
-            MAXJ = reread_stp(fileout,cwd+"/setup")
+        # check how many of those submitted are still running if no WAIT
+        if setup_0.WAIT != 9:
+             irun = 0
+             for i in range(0,isub):
+                  if doesntexst(dsub[i]+"/OUTCAR.0"):
+                       irun += 1
+             while irun >= setup_t.MAXJ:
+                  irun = 0
+                  for i in range(0,isub):
+                       if doesntexst(dsub[i]+"/OUTCAR.0"):
+                            irun += 1
+                  time.sleep(5)
+                  reread_stp(fileout,setup_t,cwd+"/setup")
 
         if (doesntexst(direc[j]+"/OUTCAR.0")) and (doesntexst(direc[j]+"/OUTCAR.error")):
             os.chdir(direc[j])
@@ -264,35 +267,39 @@ def submit_dft(cwd, inidir, datdir, fileout, jobfile, setup_0): # Create a list 
                 if setup_0.ECUT > 0.0:
                      s = "ENCUT="+str(setup_0.ECUT)
                      addstrfile("INCAR",s)
-            os.system(setup_0.CLUS[0]+" "+scrfile+" > tmpa;date >> tmpa")
-            s = file_nthln("tmpa",0)
-            t = file_nthln("tmpa",1)
-            if setup_0.QUET == 0:
-                jobid = s.split(".")[0]
-            elif setup_0.QUET == 1:
-                jobid = s.split()[len(s.split())-1]
-            elif setup_0.QUET == 2:
-                jobid = ""
-            addstrfile("id",jobid)
-            addstrfile("id",t)
-            removes_fd("tmpa")
-            print("Update: submitted DFT job % s id % s ( % 5d / % 5d ) at % s" % (scrfile,jobid,isub+1,N,direc[j]))
+            if setup_0.WAIT != 9: # submit jobs to the queue only if no WAIT!
+                 os.system(setup_0.CLUS[0]+" "+scrfile+" > tmpa;date >> tmpa")
+                 s = file_nthln("tmpa",0)
+                 t = file_nthln("tmpa",1)
+                 if setup_0.QUET == 0:
+                      jobid = s.split(".")[0]
+                 elif setup_0.QUET == 1:
+                      jobid = s.split()[len(s.split())-1]
+                 elif setup_0.QUET == 2:
+                      jobid = ""
+                 addstrfile("id",jobid)
+                 addstrfile("id",t)
+                 removes_fd("tmpa")
+                 print("Update: submitted DFT job % s id % s ( % 5d / % 5d ) at % s" % (scrfile,jobid,isub+1,N,direc[j]))
             nsub[j] = 1
             jsub[j] = jobid
             dsub.append(direc[j])
             isub += 1
             os.chdir(cwd)
-        MAXJ = reread_stp(fileout,cwd+"/setup")
+        reread_stp(fileout,setup_t,cwd+"/setup")
 
     if isub == 0:
-        export_out(fileout,"Note: no DFT job is submitted!",color = 2)
+        export_out(fileout,"Note: no DFT job is submitted!",color = 3)
     else:
         # make sure all DFT runs are finished!
         jobs = 0
         fail = []
         print("\n-------------------- waiting for DFT jobs to finish --------------------")
+        # send an email if WAIT!
+        if setup_0.WAIT == 9 and setup_0.MAIL !="":
+             os.system("echo ""Subject: %d DFT jobs at %s are pending!"" | sendmail -t %s" % (N,datdir,setup_0.MAIL))
         while jobs < N:
-            MAXJ = reread_stp(fileout,cwd+"/setup")
+            reread_stp(fileout,setup_t,cwd+"/setup")
             time.sleep(30)
             jobs = 0
             for j in range(0,N):
@@ -352,9 +359,9 @@ def jobrunning(jobid, QUET, CLUS): # check if a job is still running on cluster;
 
 def submit_prs(cwd, inidir, datdir, prsdir, fileout, cyc, setup_0):                     # Parsing the collected data
 
-    MAXJ = reread_stp(fileout,cwd+"/setup")
+    reread_stp(fileout,setup_0,cwd+"/setup")
 
-    export_out(fileout,"Note: parsing structures for cycle = % 3d in % s ..." % (cyc,prsdir),color = 2)
+    export_out(fileout,"Note: parsing structures for cycle = % 3d in % s ..." % (cyc,prsdir),color = 3)
 
     duplicates(cwd+"/"+inidir+"/"+iprs_,prsdir)
     duplicates(cwd+"/"+inidir+"/maise",prsdir)
@@ -373,13 +380,13 @@ def submit_prs(cwd, inidir, datdir, prsdir, fileout, cyc, setup_0):             
     if does__exst("stamp.dat"):
         os.chdir(cwd)
     else:
-        export_out(fileout,"Error: parsing did not finish in % s" % (prsdir),color = 1);exit()
+        export_out(fileout,"Error: parsing did not finish in % s" % (prsdir),color = 2);exit()
 
 #----------------------------------------------------------------------------------                
 
 def submit_trn(cwd, inidir, libdir, prsdir, fileout, jobfile, cyc, setup_0):      # Training NN model using the parsed data
 
-     MAXJ = reread_stp(fileout,cwd+"/setup")
+     reread_stp(fileout,setup_0,cwd+"/setup")
 
      duplicates(cwd+"/"+inidir+"/"+itrn_,libdir)
      os.chdir(libdir)
@@ -407,9 +414,9 @@ def submit_trn(cwd, inidir, libdir, prsdir, fileout, jobfile, cyc, setup_0):    
                setup_0.STRT = 0
                
      if setup_0.STRT == 0:
-          export_out(fileout,"Note: full training of neural network model for cycle = % 3d in % s ..." % (cyc,libdir),color = 2)
+          export_out(fileout,"Note: full training of neural network model for cycle = % 3d in % s ..." % (cyc,libdir),color = 3)
      else:
-          export_out(fileout,"Note: stratified training of neural network model for cycle = % 3d in % s ..." % (cyc,libdir),color = 2)
+          export_out(fileout,"Note: stratified training of neural network model for cycle = % 3d in % s ..." % (cyc,libdir),color = 3)
 
      if cyc == 0:
           t_mitr = setup_0.mitr
@@ -431,7 +438,7 @@ def submit_trn(cwd, inidir, libdir, prsdir, fileout, jobfile, cyc, setup_0):    
      for i in range(ii+1,len(t_mitr)):
           duplicates(cwd+"/"+inidir+"/"+jobfile, libdir)
           duplicates(cwd+"/"+inidir+"/maise",    libdir)
-          MAXJ = reread_stp(fileout,cwd+"/setup")
+          reread_stp(fileout,setup_0,cwd+"/setup")
           duplicates("setupt","setup")
           if setup_0.STRT == 1:
                replacestr("setup","JOBT  40","JOBT  41")
@@ -504,13 +511,13 @@ def submit_trn(cwd, inidir, libdir, prsdir, fileout, jobfile, cyc, setup_0):    
      os.system("./maise")
 
      os.chdir(cwd)
-     MAXJ = reread_stp(fileout,cwd+"/setup")
+     reread_stp(fileout,setup_0,cwd+"/setup")
 
 #----------------------------------------------------------------------------------                
 
 def similr_chk(cwd, inidir, mindir, datdir, fileout, cyc, jobfile, NM, MINIMA, setup_0): # Check for similarities based on DFT-relaxed minima
 
-     export_out(fileout, "Note: checking data for similarities in cycle = % d" % cyc,color = 2)
+     export_out(fileout, "Note: checking data for similarities in cycle = % d" % cyc,color = 3)
 
      SORT = setup_0.SORT
 
@@ -522,7 +529,7 @@ def similr_chk(cwd, inidir, mindir, datdir, fileout, cyc, jobfile, NM, MINIMA, s
      setup_0.KDNS = setup_0.kdns
 
      for z in range(0,setup_0.PNUM):
-          MAXJ = reread_stp(fileout,cwd+"/setup")
+          reread_stp(fileout,setup_0,cwd+"/setup")
           for i in range(0,len(setup_0.SIZN)):
                C   = format(cyc,"02d")
                P   = format(z,"02d")
@@ -560,7 +567,7 @@ def similr_chk(cwd, inidir, mindir, datdir, fileout, cyc, jobfile, NM, MINIMA, s
      setup_0.NSW0 = nsw0
      setup_0.KDNS = kdns
      for z in range(0,setup_0.PNUM):
-          MAXJ = reread_stp(fileout,cwd+"/setup")
+          reread_stp(fileout,setup_0,cwd+"/setup")
           for i in range(0,len(setup_0.SIZN)):
                C   = format(cyc,"02d")
                P   = format(z,"02d")
@@ -599,7 +606,7 @@ def similr_chk(cwd, inidir, mindir, datdir, fileout, cyc, jobfile, NM, MINIMA, s
 
      # assign the weights for minima
      for z in range(0,setup_0.PNUM):
-          MAXJ = reread_stp(fileout,cwd+"/setup")
+          reread_stp(fileout,setup_0,cwd+"/setup")
           for i in range(0,len(setup_0.SIZN)):
                C   = format(cyc,"02d")
                P   = format(z,"02d")
@@ -652,7 +659,7 @@ def similr_chk(cwd, inidir, mindir, datdir, fileout, cyc, jobfile, NM, MINIMA, s
           vol2 = []
           tot2 = 0
           for i in range(1,cyc):
-               MAXJ = reread_stp(fileout,cwd+"/setup")
+               reread_stp(fileout,setup_0,cwd+"/setup")
                if SORT == 1:
                     (N,di,fi) = searchfile(datdir+"/"+devo_+"*/"+format(i,"02d")+"/*r/","OUTCAR.0")
                if SORT == 2:
@@ -670,7 +677,7 @@ def similr_chk(cwd, inidir, mindir, datdir, fileout, cyc, jobfile, NM, MINIMA, s
                duplicates(cwd+"/"+inidir+"/maise",cwd+"/")
                rdfs = 1
                for j in range(0,NM):
-                    MAXJ = reread_stp(fileout,cwd+"/setup")
+                    reread_stp(fileout,setup_0,cwd+"/setup")
                     fi   = list(MINIMA.keys())[j]
                     C    = fi[1:3]
                     P    = fi[3:5]
@@ -715,13 +722,13 @@ def similr_chk(cwd, inidir, mindir, datdir, fileout, cyc, jobfile, NM, MINIMA, s
           for i in range(0,NM):
                MINIMA[list(MINIMA.keys())[i]] /= totwgt
 
-     export_out(fileout, "Note: similarity check is finished: % 4d structures rejected from % 4d (cycle = % 4d)" % (nrej, NM, cyc),color = 2)
-     MAXJ = reread_stp(fileout,cwd+"/setup")
+     export_out(fileout, "Note: similarity check is finished: % 4d structures rejected from % 4d (cycle = % 4d)" % (nrej, NM, cyc),color = 3)
+     reread_stp(fileout,setup_0,cwd+"/setup")
 
      if totwgt > 0.0:
           return (1.0/totwgt)
      else:
-          export_out(fileout,"Error: similarity check failed!",color = 1);exit()
+          export_out(fileout,"Error: similarity check failed!",color = 2);exit()
 
 #----------------------------------------------------------------------------------                
 
@@ -733,11 +740,11 @@ def initit_stp(RUN, inidir, output, setup_0): # Check initial directories; and i
 
      # check the directories to begin with
      if doesntexst(cwd+"/"+inidir):
-          export_out(fileout,"Error: %s directory does not exist" % inidir,color = 1);exit()
+          export_out(fileout,"Error: %s directory does not exist" % inidir,color = 2);exit()
      if doesntexst(cwd+"/"+inidir+"/maise"):
-          export_out(fileout,"Error: %s does not exist" % (inidir+"/maise"),color = 1);exit()
+          export_out(fileout,"Error: %s does not exist" % (inidir+"/maise"),color = 2);exit()
      if doesntexst(cwd+"/"+inidir+"/POTCAR"):
-          export_out(fileout,"Error: %s does not exist" % (inidir+"/POTCAR"),color = 1);exit()
+          export_out(fileout,"Error: %s does not exist" % (inidir+"/POTCAR"),color = 2);exit()
 
      # initializing variables and arrays with setup values
      if setup_0.nsw0 < 0:
@@ -755,7 +762,7 @@ def initit_stp(RUN, inidir, output, setup_0): # Check initial directories; and i
 
      # Queue type & CLUS [0] submission command; [1] deletion command; [2] status
      if setup_0.QUET > 2:
-          export_out(fileout,"Error: Queue option % d is not recognized!" % setup_0.QUET,color = 1);exit()
+          export_out(fileout,"Error: Queue option % d is not recognized!" % setup_0.QUET,color = 2);exit()
      if   setup_0.QUET == 0:
           setup_0.CLUS[0] = "qsub"
           setup_0.CLUS[1] = "qdel"
@@ -770,7 +777,7 @@ def initit_stp(RUN, inidir, output, setup_0): # Check initial directories; and i
           setup_0.CLUS[2] = ""
           
      if (not type(setup_0.TSPC) is list):
-          export_out(fileout,"Error: TSPC is not defined or it is not a [list]",color = 1);exit()
+          export_out(fileout,"Error: TSPC is not defined or it is not a [list]",color = 2);exit()
 
      # total number of species in the setup file
      setup_0.NSPC = len(setup_0.TSPC)
@@ -788,10 +795,10 @@ def initit_stp(RUN, inidir, output, setup_0): # Check initial directories; and i
      # check the POTCAR file for species
      (n,l,s) = findallstr(cwd+"/"+inidir+"/POTCAR","VRHFIN")
      if n != setup_0.NSPC:
-         export_out(fileout,"Error: number of elements in TSPC list (% 3d) and %s/POTCAR (% 3d) do not match" %(setup_0.NSPC,inidir,n),color = 1);exit()
+         export_out(fileout,"Error: number of elements in TSPC list (% 3d) and %s/POTCAR (% 3d) do not match" %(setup_0.NSPC,inidir,n),color = 2);exit()
      for j in range(0,n):
          if not atomtosymb(setup_0.TSPC[j]) in s[j]:
-             export_out(fileout,"Error: element number % 3d (z = % 3d) in the TSPC list does not exist in %s/POTCAR file" % (j+1,setup_0.TSPC[j],inidir),color = 1);exit()
+             export_out(fileout,"Error: element number % 3d (z = % 3d) in the TSPC list does not exist in %s/POTCAR file" % (j+1,setup_0.TSPC[j],inidir),color = 2);exit()
 
      # adjust the ISIF for EVOS according to dimensionality
      if setup_0.NDIM == 3:
@@ -799,7 +806,7 @@ def initit_stp(RUN, inidir, output, setup_0): # Check initial directories; and i
      if setup_0.NDIM == 0:
           setup_0.ISIF = 2
           if setup_0.LBOX == 0.0:
-               export_out(fileout,"Error: LBOX can not be zero when NDIM=0",color = 1);exit()
+               export_out(fileout,"Error: LBOX can not be zero when NDIM=0",color = 2);exit()
 
      # initiate TEST run variables
      if setup_0.TMIN == 0:
@@ -854,36 +861,36 @@ def initit_stp(RUN, inidir, output, setup_0): # Check initial directories; and i
           setup_0.NCMP = (setup_0.NSPC*G2+c*G4)
           
           if len(setup_0.NNNU) != len(setup_0.NNGT):
-               export_out(fileout,"Error: length of neuron/layer list does not match that of activation functions list",color = 1);exit()
+               export_out(fileout,"Error: length of neuron/layer list does not match that of activation functions list",color = 2);exit()
 
      # for EVOS (cycle = 0 ) run modes
      if RUN == JEVO and setup_0.SITR == 0: 
           if len(setup_0.mitr) != len(setup_0.tefs):
-               export_out(fileout,"Error: mitr and tefs dimensions %d and %d are not correct" % (len(setup_0.mitr),len(setup_0.tefs)),color = 1);exit()
+               export_out(fileout,"Error: mitr and tefs dimensions %d and %d are not correct" % (len(setup_0.mitr),len(setup_0.tefs)),color = 2);exit()
 
           if (not type(setup_0.npop) is list):
-               export_out(fileout,"Error: npop is not defined or it is not a [list]",color = 1);exit()
+               export_out(fileout,"Error: npop is not defined or it is not a [list]",color = 2);exit()
 
           setup_0.SPC0 = mkarray_2D(setup_0.NSPC,len(setup_0.npop))
           if setup_0.NSPC >= 1:
                if (not type(setup_0.aspc) is list):
-                    export_out(fileout,"Error: aspc is not defined or it is not a [list]",color = 1);exit()
+                    export_out(fileout,"Error: aspc is not defined or it is not a [list]",color = 2);exit()
                if len(setup_0.aspc) != len(setup_0.npop):
-                    export_out(fileout,"Error: aspc and npop do not match",color = 1);exit()
+                    export_out(fileout,"Error: aspc and npop do not match",color = 2);exit()
                for i in range(0,len(setup_0.npop)):
                     setup_0.SPC0[0][i] = setup_0.aspc[i]
           if setup_0.NSPC >= 2:
                if (not type(setup_0.bspc) is list):
-                    export_out(fileout,"Error: bspc is not defined or it is not a [list]",color = 1);exit()
+                    export_out(fileout,"Error: bspc is not defined or it is not a [list]",color = 2);exit()
                if len(setup_0.bspc) != len(setup_0.npop):
-                    export_out(fileout,"Error: bspc and npop do not match",color = 1);exit()
+                    export_out(fileout,"Error: bspc and npop do not match",color = 2);exit()
                for i in range(0,len(setup_0.npop)):
                     setup_0.SPC0[1][i] = setup_0.bspc[i]
           if setup_0.NSPC == 3:
                if (not type(setup_0.cspc) is list):
-                    export_out(fileout,"Error: cspc is not defined or it is not a [list]",color = 1);exit()
+                    export_out(fileout,"Error: cspc is not defined or it is not a [list]",color = 2);exit()
                if len(setup_0.cspc) != len(setup_0.npop):
-                    export_out(fileout,"Error: cspc and npop do not match",color = 1);exit()
+                    export_out(fileout,"Error: cspc and npop do not match",color = 2);exit()
                for i in range(0,len(setup_0.npop)):
                     setup_0.SPC0[2][i] = setup_0.cspc[i]
 
@@ -897,31 +904,31 @@ def initit_stp(RUN, inidir, output, setup_0): # Check initial directories; and i
      # for EVOS (cycle = 1+ ) run modes
      if RUN == JEVO and setup_0.NITR > 0: 
           if len(setup_0.MITR) != len(setup_0.TEFS):
-               export_out(fileout,"Error: MITR and TEFS dimensions %d and %d are not correct" % (len(setup_0.MITR),len(setup_0.TEFS)),color = 1);exit()
+               export_out(fileout,"Error: MITR and TEFS dimensions %d and %d are not correct" % (len(setup_0.MITR),len(setup_0.TEFS)),color = 2);exit()
 
           if (not type(setup_0.NPOP) is list):
-               export_out(fileout,"Error: NPOP is not defined or it is not a [list]",color = 1);exit()
+               export_out(fileout,"Error: NPOP is not defined or it is not a [list]",color = 2);exit()
 
           setup_0.SPCN = mkarray_2D(setup_0.NSPC,len(setup_0.NPOP))
           if setup_0.NSPC >= 1:
                if (not type(setup_0.ASPC) is list):
-                    export_out(fileout,"Error: ASPC is not defined or it is not a [list]",color = 1);exit()
+                    export_out(fileout,"Error: ASPC is not defined or it is not a [list]",color = 2);exit()
                if len(setup_0.ASPC) != len(setup_0.NPOP):
-                    export_out(fileout,"Error: ASPC and NPOP do not match",color = 1);exit()
+                    export_out(fileout,"Error: ASPC and NPOP do not match",color = 2);exit()
                for i in range(0,len(setup_0.NPOP)):
                     setup_0.SPCN[0][i] = setup_0.ASPC[i]
           if setup_0.NSPC >= 2:
                if (not type(setup_0.BSPC) is list):
-                    export_out(fileout,"Error: BSPC is not defined or it is not a [list]",color = 1);exit()
+                    export_out(fileout,"Error: BSPC is not defined or it is not a [list]",color = 2);exit()
                if len(setup_0.BSPC) != len(setup_0.NPOP):
-                    export_out(fileout,"Error: BSPC and NPOP do not match",color = 1);exit()
+                    export_out(fileout,"Error: BSPC and NPOP do not match",color = 2);exit()
                for i in range(0,len(setup_0.NPOP)):
                     setup_0.SPCN[1][i] = setup_0.BSPC[i]
           if setup_0.NSPC == 3:
                if (not type(setup_0.CSPC) is list):
-                    export_out(fileout,"Error: CSPC is not defined or it is not a [list]",color = 1);exit()
+                    export_out(fileout,"Error: CSPC is not defined or it is not a [list]",color = 2);exit()
                if len(setup_0.CSPC) != len(setup_0.NPOP):
-                    export_out(fileout,"Error: CSPC and NPOP do not match",color = 1);exit()
+                    export_out(fileout,"Error: CSPC and NPOP do not match",color = 2);exit()
                for i in range(0,len(setup_0.NPOP)):
                     setup_0.SPCN[2][i] = setup_0.CSPC[i]
 
@@ -939,7 +946,7 @@ def mdlerr_chk(fileout, setup_0): # Analysis of testing errors and "relative ent
      SORT = setup_0.SORT
 
      if doesntexst("err-ene.dat") or doesntexst("model"):
-          export_out(fileout,"Error: err-ene.dat or model file do(es) not exist",color = 1);exit()
+          export_out(fileout,"Error: err-ene.dat or model file do(es) not exist",color = 2);exit()
      if does__exst("setup"):
           (k,l,s) = findlststr("setup","DATA")
           prsdir  = s.split()[1]
