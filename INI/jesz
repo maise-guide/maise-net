@@ -16,8 +16,6 @@ EXE=/opt/ohpc/pub/apps/VASP/vasp.5.4.4/bin/vasp_std
 cd EVOS/GGGG/MMMM/
 date -d now +%s > stamp
 
-cp ../../../INI/POTCAR   .
-cp ../../../INI/INCAR    .
 cp ../../../INI/maisenet_kmsh.py  .
 
 python maisenet_kmsh.py KKKK
@@ -25,11 +23,11 @@ python maisenet_kmsh.py KKKK
 sed -i 's/NSW=0/NSW=WWWW/' INCAR
 mpirun $EXE  > out
 
-mv POSCAR    POSCAR.2
-mv CONTCAR   CONTCAR.2
-mv OUTCAR    OUTCAR.2
-mv OSZICAR   OSZICAR.2
-cp CONTCAR.2 POSCAR
+mv POSCAR    POSCAR.1
+mv CONTCAR   CONTCAR.1
+mv OUTCAR    OUTCAR.1
+mv OSZICAR   OSZICAR.1
+cp CONTCAR.1 POSCAR
 
 cp INCAR incar
 cp KPOINTS kpoints
@@ -43,10 +41,10 @@ cp KPOINTS kpoints
 sed -i 's/NSW=WWWW/NSW=0/' INCAR
 mpirun $EXE  > out
 
-mv POSCAR    POSCAR.1
-mv CONTCAR   CONTCAR.1
-mv OUTCAR    OUTCAR.1
-mv OSZICAR   OSZICAR.1
+mv POSCAR    POSCAR.0
+mv CONTCAR   CONTCAR.0
+mv OUTCAR    OUTCAR.0
+mv OSZICAR   OSZICAR.0
 
 rm IB* EI* PC* XD* CH* WA* vasp* DO* maisenet_kmsh.py
 

@@ -291,9 +291,13 @@ class setup:
         self.TNPP       = 0                     # number of members per population (will be resclaed with weights)
         # internals: set and used inside the code
         #----------------------------------------
+        self.EHSH       = []
+        self.ehsh       = []
+        self.THSH       = []
         self.NSPC       = 0                     # total number of species in the run
         self.ISIF       = 0                     # VASP relaxation scheme (initiated according to NDIM)
         self.PNUM       = 0                     # number of "pressure values" for data generation
+        self.SPCT       = []
         self.SPC0       = []                    # array of number of atoms per species/population (0 cycle)
         self.SIZ0       = []                    # array of "total atom number" for populations (0 cycle)
         self.SPCN       = []                    # array of number of atoms per species/population (1+ cycle)
@@ -306,4 +310,3 @@ class setup:
         self.NGEN       = 1                     # number of generations for ES (cycle 1+)
         self.ngen       = 2                     # number of generations for ES (cycle 0)
         self.NSW0       = 0                     # final high-accuracy DFT runs are static
-

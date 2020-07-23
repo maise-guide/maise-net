@@ -218,6 +218,38 @@ def mkarray_3D(x, y, z, var = 0): # Define a 3-D array (x fastest index) of "var
 # String and file handling routines
 # ======================================================================================         
 
+def maise_vers(addr): # find and return the version of maise executable at add/ as a float number: ##.##
+    td  = "tmpmaisever"
+    cwd = os.getcwd()
+
+    if doesntexst(addr+"/maise"):
+        return -1.0
+    mkdir_tree(td)
+    duplicates(addr+"/maise", td)
+    os.chdir(td)
+    os.system("./maise > out 2>&1")
+    a,b,c = findfststr("out", "version")
+    if a < 1:
+        os.chdir(cwd)
+        removes_fd(td)
+        return 0.0
+    s = c.split()
+    if s[2][0] != "m":
+        os.chdir(cwd)
+        removes_fd(td)
+        return 0.0
+    v = s[2].split(".")
+    if v[0] != "maise" or len(v) != 4 or not (is_integer(v[1]) and is_integer(v[2]) and is_integer(v[3])):
+        os.chdir(cwd)
+        removes_fd(td)
+        return 0.0
+
+    os.chdir(cwd)
+    removes_fd(td)
+    return float(v[1])*10+float(v[2])+float(v[3])/100.0
+
+#----------------------------------------------------------------------------------                
+
 def find_betwn(s, first, last): # Retruns sub-string in (s) between two markers (first,last) with num of words in that
     if first not in s:
         first = ""
@@ -472,6 +504,16 @@ def searchfile(address, fname): # Searches the "address/..." for "fname" (with w
 # ======================================================================================           
 # Math routines
 # ======================================================================================         
+
+def is_integer(s): # Check if input string is an integer number: True/False
+    return s.isdigit()
+
+#----------------------------------------------------------------------------------                
+
+def is___float(s): # check if input string is a float number: True/False
+    return s.replace('.', '', 1).isdigit()
+
+#----------------------------------------------------------------------------------                
 
 def vectr_prod(a, b, c): # Vector product of 2 vectors: c=axb
     c[0] = a[1] * b[2] - a[2] * b[1]

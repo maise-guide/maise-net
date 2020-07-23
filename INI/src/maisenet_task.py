@@ -45,7 +45,7 @@ def submit_esj(cwd, inidir, datdir, mindir, run, fileout, estype, i, z, cyc, set
           popsize = int(round(setup_0.npop[i]*setup_0.PWGT[z]))
           totrun  = len(setup_0.SIZ0)*setup_0.PNUM
           indrun  = len(setup_0.SIZ0)*z+i+1
-          duplicates(cwd+"/"+inidir+"/jesz",run+"/INI/g0")
+          duplicates(cwd+"/"+inidir+"/jesz",run+"/INI/sub0")
           duplicates(cwd+"/"+inidir+"/INCAR",run+"/INI/INCAR0")
           duplicates(cwd+"/"+inidir+"/maisenet_kmsh.py",run+"/INI")
           duplicates(cwd+"/"+inidir+"/POTCAR",run+"/INI")
@@ -54,9 +54,9 @@ def submit_esj(cwd, inidir, datdir, mindir, run, fileout, estype, i, z, cyc, set
           replacestr(run+"/INI/INCAR0","SMSM",str(setup_0.SMER))
           replacestr(run+"/INI/INCAR0","SGSG",str(setup_0.SIGM))
           replacestr(run+"/INI/INCAR0","AAAA",str(setup_0.prec))
-          replacestr(run+"/INI/g0","WWWW",str(setup_0.nsw0))
-          replacestr(run+"/INI/g0","KKKK",str(setup_0.kdns))
-          if not setup_0.SYMP == 0.0:
+          replacestr(run+"/INI/sub0","WWWW",str(setup_0.nsw0))
+          replacestr(run+"/INI/sub0","KKKK",str(setup_0.kdns))
+          if setup_0.SYMP != 0.0:
                addstrfile(run+"/INI/INCAR0","SYMPREC="+str(setup_0.SYMP))
           if setup_0.SORB > 0:
                addstrfile(run+"/INI/INCAR0","LSORBIT=.TRUE.")
@@ -66,18 +66,18 @@ def submit_esj(cwd, inidir, datdir, mindir, run, fileout, estype, i, z, cyc, set
                addstrfile(run+"/INI/INCAR0",s)
           if setup_0.KDNS != setup_0.kdns:
                s = "python maisenet_kmsh.py "+str(setup_0.KDNS)
-               replacestr(run+"/INI/g0","#kmesh",s)
+               replacestr(run+"/INI/sub0","#kmesh",s)
           if setup_0.PREC != setup_0.prec:
                s = "sed -i '/^PREC/d' INCAR"
-               replacestr(run+"/INI/g0","#prec0",s)
+               replacestr(run+"/INI/sub0","#prec0",s)
                s = "echo 'PREC="+str(setup_0.PREC)+"' >> INCAR"
-               replacestr(run+"/INI/g0","#prec1",s)
+               replacestr(run+"/INI/sub0","#prec1",s)
           if setup_0.ECUT != setup_0.ecut:
                s = "sed -i '/^ENCUT/d' INCAR"
-               replacestr(run+"/INI/g0","#encut0",s)
+               replacestr(run+"/INI/sub0","#encut0",s)
                if setup_0.ECUT > 0.0:
                     s = "echo 'ENCUT="+str(setup_0.ECUT)+"' >> INCAR"
-                    replacestr(run+"/INI/g0","#encut1",s)
+                    replacestr(run+"/INI/sub0","#encut1",s)
           duplicates(run+"/setupz",run+"/setup")
           s = " "
           for j in range(0,setup_0.NSPC):
@@ -89,7 +89,7 @@ def submit_esj(cwd, inidir, datdir, mindir, run, fileout, estype, i, z, cyc, set
           popsize = int(round(setup_0.NPOP[i]*setup_0.PWGT[z]))
           totrun  = len(setup_0.SIZN)*setup_0.PNUM
           indrun  = len(setup_0.SIZN)*z+i+1
-          duplicates(cwd+"/"+inidir+"/jesn",run+"/INI/g0")
+          duplicates(cwd+"/"+inidir+"/jesn",run+"/INI/sub0")
           duplicates(cwd+"/"+inidir+"/maise",run+"/INI/NNET/maise-nnet")
           duplicates(cwd+"/model",run+"/INI/NNET")
           replacestr(run+"/INI/NNET/setup","PPPP",str(setup_0.PGPA[z]))
@@ -149,17 +149,16 @@ def submit_esj(cwd, inidir, datdir, mindir, run, fileout, estype, i, z, cyc, set
                     for k in range(popsize,popsize*2):
                          m = format(pop, "03d")
                          r = "EVOS/G"+format(j, "03d")+"/M"+format(k, "03d")
-                         if checks_dft(r+"/OUTCAR.1") < 0:
+                         if checks_dft(r+"/OUTCAR.0") < 0:
                               export_out(fileout,"Warning: DFT run was not successful in % s" % (r),time = 0)
-                              renames_fd(r+"/POSCAR.1",r+"/POSCAR.error")
-                              renames_fd(r+"/CONTCAR.1",r+"/CONTCAR.error")
-                              renames_fd(r+"/OUTCAR.1",r+"/OUTCAR.error")
+                              renames_fd(r+"/POSCAR.0",r+"/POSCAR.error")
+                              renames_fd(r+"/CONTCAR.0",r+"/CONTCAR.error")
+                              renames_fd(r+"/OUTCAR.0",r+"/OUTCAR.error")
                          else:
                               des     = datdir+"/"+m+"000"
-                              mkdir_tree(des)
-                              (o,p,s) = readoutcar(r+"/OUTCAR.1", read = "last")
+                              (o,p,s) = readoutcar(r+"/OUTCAR.0", read = "last")
                               nam     = run.replace(cwd+"/","")+"/"+r+" "+str(s[0].ENTH)+" "+des.replace(cwd+"/","")
-                              duplicates(r+"/CONTCAR.1","POOL/POSCAR"+m)
+                              duplicates(r+"/CONTCAR.0","POOL/POSCAR"+m)
                               replacenln("POOL/POSCAR"+m,0,nam)
                               duplicates("POOL/POSCAR"+m,mindir+"/P"+format(cyc,"02d")+tag+m)
                               pop    += 1
@@ -252,14 +251,14 @@ def submit_dft(cwd, inidir, datdir, fileout, jobfile, setup_0): # Create a list 
                  replacestr(scrfile,"KKKK",str(setup_0.KDNS))
             if doesntexst("INCAR"):
                 duplicates(cwd+"/"+inidir+"/INCAR"   , ".")
-                if not setup_0.NSW0 == 0:
+                if setup_0.NSW0 != 0:
                     replacestr("INCAR","NSW=0","NSW=%s" % str(setup_0.NSW0))
                 replacestr("INCAR","PPPP",str(setup_0.PGPA[0]*10.0))
                 replacestr("INCAR","AAAA",str(setup_0.PREC))
                 replacestr("INCAR","GGGG",str(setup_0.ISIF))
                 replacestr("INCAR","SMSM",str(setup_0.SMER))
                 replacestr("INCAR","SGSG",str(setup_0.SIGM))
-                if not setup_0.SYMP == 0.0:
+                if setup_0.SYMP != 0.0:
                      addstrfile("INCAR","SYMPREC="+str(setup_0.SYMP))
                 if setup_0.SORB > 0:
                      addstrfile("INCAR","LSORBIT=.TRUE.")
@@ -538,6 +537,8 @@ def similr_chk(cwd, inidir, mindir, datdir, fileout, cyc, jobfile, NM, MINIMA, s
                for j in range(0,fls):
                     I   = nam[j][7:10]
                     if SORT == 1:
+                         adr = datdir+devo_+setup_0.EHSH[int(P)][int(R)]+"/"+C+"/"+I
+                    if SORT == 3:
                          adr = datdir+devo_+P+R+"/"+C+"/"+I
                     if SORT == 2:
                          adr = datdir+devo_+P+"/"+C+"/"+R+"/"+I
@@ -554,7 +555,7 @@ def similr_chk(cwd, inidir, mindir, datdir, fileout, cyc, jobfile, NM, MINIMA, s
                          replacestr(run+"/INCAR","GGGG",str(setup_0.ISIF))
                          replacestr(run+"/INCAR","SMSM",str(setup_0.SMER))
                          replacestr(run+"/INCAR","SGSG",str(setup_0.SIGM))
-                         if not setup_0.SYMP == 0.0:
+                         if setup_0.SYMP != 0.0:
                               addstrfile(run+"/INCAR","SYMPREC="+str(setup_0.SYMP))
                          if setup_0.SORB > 0:
                               addstrfile(run+"/INCAR","LSORBIT=.TRUE.")
@@ -576,6 +577,8 @@ def similr_chk(cwd, inidir, mindir, datdir, fileout, cyc, jobfile, NM, MINIMA, s
                for j in range(0,fls):
                     I   = nam[j][7:10]
                     if SORT == 1:
+                         adr = datdir+devo_+setup_0.EHSH[int(P)][int(R)]+"/"+C+"/"+I
+                    if SORT == 3:
                          adr = datdir+devo_+P+R+"/"+C+"/"+I
                     if SORT == 2:
                          adr = datdir+devo_+P+"/"+C+"/"+R+"/"+I
@@ -591,7 +594,7 @@ def similr_chk(cwd, inidir, mindir, datdir, fileout, cyc, jobfile, NM, MINIMA, s
                          replacestr(run+"/INCAR","GGGG",str(setup_0.ISIF))
                          replacestr(run+"/INCAR","SMSM",str(setup_0.SMER))
                          replacestr(run+"/INCAR","SGSG",str(setup_0.SIGM))
-                         if not setup_0.SYMP == 0.0:
+                         if setup_0.SYMP != 0.0:
                               addstrfile(run+"/INCAR","SYMPREC="+str(setup_0.SYMP))
                          if setup_0.SORB > 0:
                               addstrfile(run+"/INCAR","LSORBIT=.TRUE.")
@@ -618,6 +621,8 @@ def similr_chk(cwd, inidir, mindir, datdir, fileout, cyc, jobfile, NM, MINIMA, s
                for j in range(0,fls):
                     I   = nam[j][7:10]
                     if SORT == 1:
+                         run = datdir+devo_+setup_0.EHSH[int(P)][int(R)]+"/"+C+"/"+I+"00r"
+                    if SORT == 3:
                          run = datdir+devo_+P+R+"/"+C+"/"+I+"00r"
                     if SORT == 2:
                          run = datdir+devo_+P+"/"+C+"/"+R+"/"+I+"00r"
@@ -662,6 +667,8 @@ def similr_chk(cwd, inidir, mindir, datdir, fileout, cyc, jobfile, NM, MINIMA, s
                reread_stp(fileout,setup_0,cwd+"/setup")
                if SORT == 1:
                     (N,di,fi) = searchfile(datdir+"/"+devo_+"*/"+format(i,"02d")+"/*r/","OUTCAR.0")
+               if SORT == 3:
+                    (N,di,fi) = searchfile(datdir+"/"+devo_+"*/"+format(i,"02d")+"/*r/","OUTCAR.0")
                if SORT == 2:
                     (N,di,fi) = searchfile(datdir+"/"+devo_+"*/"+format(i,"02d")+"/*/*r/","OUTCAR.0")
                if SORT == 0:
@@ -684,6 +691,8 @@ def similr_chk(cwd, inidir, mindir, datdir, fileout, cyc, jobfile, NM, MINIMA, s
                     R    = fi[5:7]
                     I    = fi[7:10]
                     if SORT == 1:
+                         run = datdir+devo_+setup_0.EHSH[int(P)][int(R)]+"/"+C+"/"+I+"00r"
+                    if SORT == 3:
                          run = datdir+devo_+P+R+"/"+C+"/"+I+"00r"
                     if SORT == 2:
                          run = datdir+devo_+P+"/"+C+"/"+R+"/"+I+"00r"
@@ -841,6 +850,40 @@ def initit_stp(RUN, inidir, output, setup_0): # Check initial directories; and i
      if len(setup_0.TSTC) == 0 or (not type(setup_0.TSTC) is list):
           if setup_0.NSPC == 3:
                setup_0.TSTC = tst3CSPC[:]
+     setup_0.SPCT  = mkarray_2D(setup_0.NSPC,len(setup_0.TSTA))
+     for j in range(0,setup_0.NSPC):
+          if j == 0:
+               for i in range(0,len(setup_0.TSTA)):
+                    setup_0.SPCT[j][i] = setup_0.TSTA[i]
+          if j == 1:
+               for i in range(0,len(setup_0.TSTB)):
+                    setup_0.SPCT[j][i] = setup_0.TSTB[i]
+          if j == 2:
+               for i in range(0,len(setup_0.TSTC)):
+                    setup_0.SPCT[j][i] = setup_0.TSTC[i]
+     setup_0.SIZT = []
+     for j in range(0,len(setup_0.TSTA)):
+          c = 0
+          for i in range(0,setup_0.NSPC):
+               c += setup_0.SPCT[i][j] 
+          setup_0.SIZT.append(c)
+
+     # create hash list for test directory names
+     setup_0.THSH  = mkarray_2D(len(setup_0.TGPA),len(setup_0.TSTA))
+     for i in range(0,len(setup_0.TSTA)):
+          n = setup_0.SPCT[0][i]
+          for j in range(1,setup_0.NSPC):
+               n = (n*14+setup_0.SPCT[j][i])
+          for j in range(0,len(setup_0.TGPA)):
+               m = int(n*14+round(setup_0.TGPA[j]*10.0))
+               setup_0.THSH[j][i]=format(m,"06d")
+     for i in range(0,len(setup_0.TGPA)):
+          for j in range(0,len(setup_0.SIZT)):
+               n = str(setup_0.TGPA[i])+"  "
+               for k in range(0,setup_0.NSPC):
+                    n = n+format(setup_0.SPCT[k][j],"02d")+"  "
+               export_out(fileout,"hash codes ( TEST  ) % 30s  -> % s" % (n,setup_0.THSH[i][j]),time = 0)
+
 
      # number of pressure values for EVOS runs
      setup_0.PNUM = len(setup_0.PGPA)
@@ -901,6 +944,22 @@ def initit_stp(RUN, inidir, output, setup_0): # Check initial directories; and i
                     c += setup_0.SPC0[i][j] 
                setup_0.SIZ0.append(c)
 
+          # create hash list for test directory names
+          setup_0.ehsh = mkarray_2D(len(setup_0.PGPA),len(setup_0.SIZ0))
+          for i in range(0,len(setup_0.SIZ0)):
+               n = setup_0.SPC0[0][i]
+               for j in range(1,setup_0.NSPC):
+                    n = (n*14+setup_0.SPC0[j][i])
+               for j in range(0,len(setup_0.PGPA)):
+                    m = int(n*14+round(setup_0.PGPA[j]*10.0))
+                    setup_0.ehsh[j][i]=format(m,"06d")
+          for i in range(0,setup_0.PNUM):
+               for j in range(0,len(setup_0.SIZ0)):
+                    n = str(setup_0.PGPA[i])+"  "
+                    for k in range(0,setup_0.NSPC):
+                         n = n+format(setup_0.SPC0[k][j],"02d")+"  "
+                    export_out(fileout,"hash codes ( EVOS0 ) % 30s  -> % s" % (n,setup_0.ehsh[i][j]),time = 0)
+
      # for EVOS (cycle = 1+ ) run modes
      if RUN == JEVO and setup_0.NITR > 0: 
           if len(setup_0.MITR) != len(setup_0.TEFS):
@@ -938,6 +997,22 @@ def initit_stp(RUN, inidir, output, setup_0): # Check initial directories; and i
                for i in range(0,setup_0.NSPC):
                     c += setup_0.SPCN[i][j] 
                setup_0.SIZN.append(c)
+
+          # create hash list for test directory names
+          setup_0.EHSH = mkarray_2D(len(setup_0.PGPA),len(setup_0.SIZN))
+          for i in range(0,len(setup_0.SIZN)):
+               n = setup_0.SPCN[0][i]
+               for j in range(1,setup_0.NSPC):
+                    n = (n*14+setup_0.SPCN[j][i])
+               for j in range(0,len(setup_0.PGPA)):
+                    m = int(n*14+round(setup_0.PGPA[j]*10.0))
+                    setup_0.EHSH[j][i]=format(m,"06d")
+          for i in range(0,setup_0.PNUM):
+               for j in range(0,len(setup_0.SIZN)):
+                    n = str(setup_0.PGPA[i])+"  "
+                    for k in range(0,setup_0.NSPC):
+                         n = n+format(setup_0.SPCN[k][j],"02d")+"  "
+                    export_out(fileout,"hash codes ( EVOSN ) % 30s  -> % s" % (n,setup_0.EHSH[i][j]),time = 0)
 
 #----------------------------------------------------------------------------------                
 

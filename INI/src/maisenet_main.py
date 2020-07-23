@@ -193,7 +193,7 @@ def DATGEN_EOS(RUN, output, cyc, setup_0): # EOS DATA GENERATION
                replacestr(run+"/INCAR","GGGG",str(x_setup.ISIF))
                replacestr(run+"/INCAR","SMSM",str(x_setup.SMER))
                replacestr(run+"/INCAR","SGSG",str(x_setup.SIGM))
-               if not x_setup.SYMP == 0.0:
+               if x_setup.SYMP != 0.0:
                     addstrfile(run+"/INCAR","SYMPREC="+str(x_setup.SYMP))
                if x_setup.SORB > 0:
                     addstrfile(run+"/INCAR","LSORBIT=.TRUE.")
@@ -222,7 +222,7 @@ def DATGEN_EOS(RUN, output, cyc, setup_0): # EOS DATA GENERATION
 
           if doesntexst(eosdir+tag+"/CONTCAR.0"):
                export_out(fileout,"Error: the file %s does not exist" % (eosdir+tag+"/CONTCAR.0"),color = 2);exit()
-          if (SORT == 1 or SORT == 2) and does__exst(datdir+deos_+tag):
+          if (SORT == 1 or SORT == 2 or SORT == 3) and does__exst(datdir+deos_+tag):
                if x_setup.ERNI == 0:
                     export_out(fileout,"Error: % s directory already exists" % (datdir+deos_+tag),color = 2);exit()
                else:
@@ -238,11 +238,13 @@ def DATGEN_EOS(RUN, output, cyc, setup_0): # EOS DATA GENERATION
                lbl = format(j,"02d")
                if RUN != JBAS:
                     if SORT == 1:
+                         run = datdir+daes_+x_setup.EHSH[int(prs)][int(ids)]+"/"+str(cle)+"/"+str(siz)+"/"+lbl
+                    if SORT == 3:
                          run = datdir+daes_+str(prs)+str(ids)+"/"+str(cle)+"/"+str(siz)+"/"+lbl
                     if SORT == 2 or SORT == 0:
                          run = datdir+daes_+"/"+str(prs)+"/"+str(cle)+"/"+str(ids)+"/"+str(siz)+"/"+lbl
                if RUN == JBAS:
-                    if SORT == 1 or SORT == 2:
+                    if SORT == 1 or SORT == 2 or SORT == 3:
                          run = datdir+deos_+tag+"/"+lbl
                     if SORT == 0:
                          run = datdir+deos_+"/"+tag+"/"+lbl
@@ -255,7 +257,7 @@ def DATGEN_EOS(RUN, output, cyc, setup_0): # EOS DATA GENERATION
                replacestr(run+"/INCAR","GGGG",str(x_setup.ISIF))
                replacestr(run+"/INCAR","SMSM",str(x_setup.SMER))
                replacestr(run+"/INCAR","SGSG",str(x_setup.SIGM))
-               if not x_setup.SYMP == 0.0:
+               if x_setup.SYMP != 0.0:
                     addstrfile(run+"/INCAR","SYMPREC="+str(x_setup.SYMP))
                if x_setup.SORB > 0:
                     addstrfile(run+"/INCAR","LSORBIT=.TRUE.")
@@ -291,12 +293,19 @@ def DATGEN_EOS(RUN, output, cyc, setup_0): # EOS DATA GENERATION
                          export_str(pos,run+"/poscar")
 
           if RUN != JBAS:
-               if SORT == 1:
+               duplicates(cwd+"/"+mini_+"/"+iprs_+"/tag-aes",datdir+daes_+x_setup.EHSH[int(prs)][int(ids)]+"/tag")
+               if SORT == 1 and doesntexst(datdir+daes_+x_setup.EHSH[int(prs)][int(ids)]+"/inf"):
+                    s = ""
+                    for j in range(0,x_setup.NSPC):
+                         s += str(x_setup.SPCN[j][int(ids)])+" "
+                    addstrfile(datdir+daes_+x_setup.EHSH[int(prs)][int(ids)]+"/inf","pressure % s" % (str(x_setup.PGPA[int(prs)])))
+                    addstrfile(datdir+daes_+x_setup.EHSH[int(prs)][int(ids)]+"/inf","composit % s" % (s))
+               if SORT == 3:
                     duplicates(cwd+"/"+mini_+"/"+iprs_+"/tag-aes",datdir+daes_+str(prs)+str(ids)+"/tag")
                if SORT == 2 or SORT == 0:
                     duplicates(cwd+"/"+mini_+"/"+iprs_+"/tag-aes",datdir+daes_+"/tag")
           if RUN == JBAS:
-               if SORT == 1 or SORT == 2:
+               if SORT == 1 or SORT == 2 or SORT == 3:
                     duplicates(cwd+"/"+mini_+"/"+iprs_+"/tag-eos",datdir+deos_+tag+"/tag")
                if SORT == 0:
                     duplicates(cwd+"/"+mini_+"/"+iprs_+"/tag-eos",datdir+deos_+"/tag")
@@ -356,7 +365,7 @@ def DATGEN_CLS(RUN, output, setup_0): # CLST DATA GENERATION
      export_out(fileout,"Note: a small SIGMA of % 5.3lf will be used for the %s data generation" % (z_setup.SIGM,runt),color = 3)
 
 
-     if SORT == 1 or SORT == 0:
+     if SORT == 1 or SORT == 3 or SORT == 0:
           if does__exst(datdir+dcls_):
                if z_setup.ERNI == 0:
                     export_out(fileout,"Error: % s directory already exists" % (datdir+dcls_),color = 2);exit()
@@ -398,7 +407,7 @@ def DATGEN_CLS(RUN, output, setup_0): # CLST DATA GENERATION
                     pos.NAET.append(pos.NATM/z_setup.NSPC)
                pos.POSI[0]    = [0.5,0.5,0.5]
                pos.POSI[1]    = [0.5,0.5,0.5+comp]
-               if SORT == 1 or SORT == 0:
+               if SORT == 1 or SORT == 3 or SORT == 0:
                     run = datdir+dcls_+"/02/"+tag
                if SORT == 2:
                     run = datdir+dcls_+"02/"+tag
@@ -412,7 +421,7 @@ def DATGEN_CLS(RUN, output, setup_0): # CLST DATA GENERATION
                pos.POSI[1]    = [0.5,0.5,0.5+comp]
                pos.POSI[2]    = [0.5,0.5+comp,0.5]
                pos.POSI[3]    = [0.5,0.5+comp,0.5+comp]
-               if SORT == 1 or SORT == 0:
+               if SORT == 1 or SORT == 3 or SORT == 0:
                     run = datdir+dcls_+"/04/"+tag
                if SORT == 2:
                     run = datdir+dcls_+"04/"+tag
@@ -426,14 +435,14 @@ def DATGEN_CLS(RUN, output, setup_0): # CLST DATA GENERATION
                pos.POSI[0]    = [0.5,0.5,0.5]
                pos.POSI[1]    = [0.5,0.5,0.5+comp]
                pos.POSI[2]    = [0.5,0.5+comp,0.5]
-               if SORT == 1 or SORT == 0:
+               if SORT == 1 or SORT == 3 or SORT == 0:
                     run = datdir+dcls_+"/03/"+tag
                if SORT == 2:
                     run = datdir+dcls_+"03/"+tag
                mkdir_tree(run)
                export_str(pos,run+"/POSCAR")
 
-     if SORT == 1 or SORT == 0:
+     if SORT == 1 or SORT == 3 or SORT == 0:
           duplicates(cwd+"/"+mini_+"/"+iprs_+"/tag-cls",datdir+dcls_+"/tag")
      if SORT == 2:
           if z_setup.NSPC < 3:
@@ -506,6 +515,8 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                     POPULN  = format(i,"02d")
                     SRCDIR  = srcdir+"/"+PRESSU+"/"+POPULN  # always indexed as: EVO/cycle/pressure/population
                     if SORT == 1:
+                         DATDIR = datdir+devo_+m_setup.ehsh[z][i]+"/"+CYCLES   # indexed using hash
+                    if SORT == 3:
                          DATDIR = datdir+devo_+PRESSU+POPULN+"/"+CYCLES # indexed as: DAT/"evo"pressure"population"/cycle/
                     if SORT == 2:
                          DATDIR = datdir+devo_+PRESSU+"/"+CYCLES # indexed as: DAT/"evo"pressure/cycle/population
@@ -532,6 +543,9 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                I   = fi[7:10]
                sr  = file_nthln(mdi[i]+"/"+mfi[i],0).split()[0]
                if SORT == 1:
+                    run = datdir+devo_+m_setup.ehsh[int(P)][int(R)]+"/"+C+"/"+I+"000"   # indexed using hash
+                    tar = datdir+devo_+m_setup.ehsh[int(P)][int(R)]+"/tag"
+               if SORT == 3:
                     run = datdir+devo_+P+R+"/"+C+"/"+I+"000"  # indexed as: DAT/"evo"pressure"populations"/cycle
                     tar = datdir+devo_+P+R+"/tag"
                if SORT == 2:
@@ -541,10 +555,16 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                     run = datdir+devo_+"/"+P+"/"+C+"/"+R+"/"+I+"000"  # indexed as: DAT/"evo/"pressure/cycle/population
                     tar = datdir+devo_+"/tag"
                mkdir_tree(run)
+               if SORT == 1 and doesntexst(datdir+devo_+m_setup.ehsh[int(P)][int(R)]+"/inf"):
+                    s = ""
+                    for j in range(0,m_setup.NSPC):
+                         s += str(m_setup.SPC0[j][int(R)])+" "
+                    addstrfile(datdir+devo_+m_setup.ehsh[int(P)][int(R)]+"/inf","pressure % s" % (str(m_setup.PGPA[int(P)])))
+                    addstrfile(datdir+devo_+m_setup.ehsh[int(P)][int(R)]+"/inf","composit % s" % (s))
                duplicates(cwd+"/"+mini_+"/"+iprs_+"/tag-evo",tar)
-               duplicates(mindir+"/"+fi,run+"/POSCAR.0") # this is equal to: duplicates(sr+"/CONTCAR.1",run+"/POSCAR.0")
-               duplicates(sr+"/OUTCAR.1",run+"/OUTCAR.0")
-               datdat_out(fileout,sr+"/OUTCAR.1",run)
+               duplicates(mindir+"/"+fi,run+"/POSCAR.0") # this is equal to: duplicates(sr+"/CONTCAR.0",run+"/POSCAR.0")
+               duplicates(sr+"/OUTCAR.0",run+"/OUTCAR.0")
+               datdat_out(fileout,sr+"/OUTCAR.0",run)
 
           # parse the data for cyc=0
           submit_prs(cwd,mini_,datdir,prsdir,fileout,cyc,m_setup)
@@ -553,6 +573,9 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
           submit_trn(cwd,mini_,libdir,prsdir,fileout,"jtrn",cyc,m_setup)
 
           if SORT == 1:
+               (N,direc,files) = searchfile(datdir+devo_+"*/"+CYCLES,"POSCAR.0")
+               export_out(fileout,"Note: %s data generation in cycle % d is all done! total % 5d DFT structure are generated in % s" % (runt,cyc,N,datdir+devo_+"*/"+CYCLES),color = 3)
+          if SORT == 3:
                (N,direc,files) = searchfile(datdir+devo_+"*/"+CYCLES,"POSCAR.0")
                export_out(fileout,"Note: %s data generation in cycle % d is all done! total % 5d DFT structure are generated in % s" % (runt,cyc,N,datdir+devo_+"*/"+CYCLES),color = 3)
           if SORT == 2:
@@ -591,6 +614,8 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                     POPULN  = format(i,"02d")
                     SRCDIR  = srcdir+"/"+PRESSU+"/"+POPULN  # always indexed as: EVO/cycle/pressure/population
                     if SORT == 1:
+                         DATDIR = datdir+devo_+m_setup.EHSH[z][i]+"/"+CYCLES # indexed by hash
+                    if SORT == 3:
                          DATDIR = datdir+devo_+PRESSU+POPULN+"/"+CYCLES # indexed as: DAT/"evo"pressure"population"/cycle
                     if SORT == 2:
                          DATDIR = datdir+devo_+PRESSU+"/"+CYCLES # indexed as: DAT/"evo"pressure/cycle/population
@@ -617,6 +642,9 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                I   = fi[7:10]
                sr  = file_nthln(mdi[i]+"/"+mfi[i],0).split()[0]
                if SORT == 1:
+                    run = datdir+devo_+m_setup.EHSH[int(P)][int(R)]+"/"+C+"/"+I+"000"  # indexed as: DAT/"evo"pressure"populations"/cycle
+                    tar = datdir+devo_+m_setup.EHSH[int(P)][int(R)]+"/tag"
+               if SORT == 3:
                     run = datdir+devo_+P+R+"/"+C+"/"+I+"000"  # indexed as: DAT/"evo"pressure"populations"/cycle
                     tar = datdir+devo_+P+R+"/tag"
                if SORT == 2:
@@ -626,6 +654,12 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                     run = datdir+devo_+"/"+P+"/"+C+"/"+R+"/"+I+"000"  # indexed as: DAT/"evo/"pressure/cycle/population
                     tar = datdir+devo_+"/tag"
                mkdir_tree(run)
+               if SORT == 1 and doesntexst(datdir+devo_+m_setup.EHSH[int(P)][int(R)]+"/inf"):
+                    s = ""
+                    for j in range(0,m_setup.NSPC):
+                         s += str(m_setup.SPCN[j][int(R)])+" "
+                    addstrfile(datdir+devo_+m_setup.EHSH[int(P)][int(R)]+"/inf","pressure % s" % (str(m_setup.PGPA[int(P)])))
+                    addstrfile(datdir+devo_+m_setup.EHSH[int(P)][int(R)]+"/inf","composit % s" % (s))
                duplicates(cwd+"/"+mini_+"/"+iprs_+"/tag-evo",tar)
                duplicates(mindir+"/"+fi,run+"/POSCAR")
                duplicates(cwd+"/"+mini_+"/INCAR", run)
@@ -634,7 +668,7 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                replacestr(run+"/INCAR","GGGG",str(m_setup.ISIF))
                replacestr(run+"/INCAR","SMSM",str(m_setup.SMER))
                replacestr(run+"/INCAR","SGSG",str(m_setup.SIGM))
-               if not m_setup.SYMP == 0.0:
+               if m_setup.SYMP != 0.0:
                     addstrfile(run+"/INCAR","SYMPREC="+str(m_setup.SYMP))
                if m_setup.SORB > 0:
                     addstrfile(run+"/INCAR","LSORBIT=.TRUE.")
@@ -644,6 +678,8 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                     addstrfile(run+"/INCAR",l)
 
           if SORT == 1:
+               export_out(fileout,"Note: submitting % 5d DFT runs for minima of %s dataset at % s..." % (NM,runt,datdir+devo_+"*/"+CYCLES),color = 3)
+          if SORT == 3:
                export_out(fileout,"Note: submitting % 5d DFT runs for minima of %s dataset at % s..." % (NM,runt,datdir+devo_+"*/"+CYCLES),color = 3)
           if SORT == 2:
                export_out(fileout,"Note: submitting % 5d DFT runs for minima of %s dataset at % s..." % (NM,runt,datdir+devo_+"*/"+CYCLES),color = 3)
@@ -694,13 +730,15 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                trajtmp = 0
                if wegt > 0:
                     reread_stp(fileout,m_setup,cwd+"/setup")
-                    (o,N,POSCARS) = readoutcar(S+"/OUTCAR.1")
+                    (o,N,POSCARS) = readoutcar(S+"/OUTCAR.0")
                     delta = int(round((N-1)/(wegt+1)))
                     if wegt >= N or delta == 0: # if there is no enough struc to sample; do all
                          wegt  = N-1
                          delta = 1
                     for k in range(1,wegt+1):
                          if SORT == 1:
+                              run = datdir+devo_+m_setup.EHSH[int(P)][int(R)]+"/"+C+"/"+I+format(N-k*delta,"03d")
+                         if SORT == 3:
                               run = datdir+devo_+P+R+"/"+C+"/"+I+format(N-k*delta,"03d")
                          if SORT == 2:
                               run = datdir+devo_+P+"/"+C+"/"+R+"/"+I+format(N-k*delta,"03d")
@@ -714,7 +752,7 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                          replacestr(run+"/INCAR","GGGG",str(m_setup.ISIF))
                          replacestr(run+"/INCAR","SMSM",str(m_setup.SMER))
                          replacestr(run+"/INCAR","SGSG",str(m_setup.SIGM))
-                         if not m_setup.SYMP == 0.0:
+                         if m_setup.SYMP != 0.0:
                               addstrfile(run+"/INCAR","SYMPREC="+str(m_setup.SYMP))
                          if m_setup.SORB > 0:
                               addstrfile(run+"/INCAR","LSORBIT=.TRUE.")
@@ -744,6 +782,12 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                submit_dft(cwd,mini_,datdir+devo_+"*/"+CYCLES,fileout,"jdft",m_setup)
                (N1,direc,files) = searchfile(datdir+devo_+"*/"+CYCLES,"POSCAR.0")
                export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (runt,cyc,N1,datdir+devo_+"*/"+CYCLES),color = 3)
+          if SORT == 3:
+               (N,direc,fies) = searchfile(datdir+devo_+"*/"+CYCLES,"POSCAR")
+               export_out(fileout,"Note: submitting % 5d DFT runs for relaxation path of %s dataset at % s..." % (N,runt,datdir+devo_+"*/"+CYCLES),color = 3)
+               submit_dft(cwd,mini_,datdir+devo_+"*/"+CYCLES,fileout,"jdft",m_setup)
+               (N1,direc,files) = searchfile(datdir+devo_+"*/"+CYCLES,"POSCAR.0")
+               export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (runt,cyc,N1,datdir+devo_+"*/"+CYCLES),color = 3)
           if SORT == 2:
                (N,direc,fies) = searchfile(datdir+devo_+"*/"+CYCLES,"POSCAR")
                export_out(fileout,"Note: submitting % 5d DFT runs for relaxation path of %s dataset at % s..." % (N,runt,datdir+devo_+"*/"+CYCLES),color = 3)
@@ -768,6 +812,8 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                     R    = fi[5:7]
                     I    = fi[7:10]
                     if SORT == 1:
+                         run = datdir+devo_+m_setup.EHSH[int(P)][int(R)]+"/"+C+"/"+I+"00r"
+                    if SORT == 3:
                          run = datdir+devo_+P+R+"/"+C+"/"+I+"00r"
                     if SORT == 2:
                          run = datdir+devo_+P+"/"+C+"/"+R+"/"+I+"00r"
@@ -785,6 +831,9 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                if SORT == 1:
                     (N2,direc,files) = searchfile(datdir+daes_+"*/"+CYCLES,"POSCAR.0")
                     export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (daes_.upper(),cyc,N2,datdir+daes_+"*/"+CYCLES),color = 3)
+               if SORT == 3:
+                    (N2,direc,files) = searchfile(datdir+daes_+"*/"+CYCLES,"POSCAR.0")
+                    export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (daes_.upper(),cyc,N2,datdir+daes_+"*/"+CYCLES),color = 3)
                if SORT == 2 or SORT == 0:
                     (N2,direc,files) = searchfile(datdir+daes_+"/*/"+CYCLES,"POSCAR.0")
                     export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (daes_.upper(),cyc,N2,datdir+daes_+"/*/"+CYCLES),color = 3)
@@ -796,22 +845,21 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
           submit_trn(cwd,mini_,libdir,prsdir,fileout,"jtrn",cyc,m_setup)
 
           # TEST data generation (if any)
-          reread_stp(fileout,m_setup,cwd+"/setup")
-          DATGEN_TST(RUN,output,cyc,1,m_setup)
           if m_setup.ATST == 1: # collect TEST data if ATST run!
+               reread_stp(fileout,m_setup,cwd+"/setup")
+               DATGEN_TST(RUN,output,cyc,1,m_setup)
                if does__exst(mtst_+"/"+CYCLES+"/"+dtst_):
-                    if SORT == 1 or SORT == 2 or SORT == 0:
+                    if SORT == 1 or SORT == 2 or SORT == 0 or SORT == 3:
                          (N,direc,files) = searchfile(mtst_+"/"+CYCLES+"/"+dtst_,"POSCAR.0")
                          for i in range(0,N):
                               s = direc[i].replace(mtst_+"/"+CYCLES+"/"+dtst_+"/","")
-                              z = s[4:6]
-                              r = s[6:8]
-                              c = s[9:11]
-                              d = s[12:15]
-                              duplicates(mtst_+"/"+CYCLES+"/"+dtst_+"/"+dtst_+z+r+"/"+c+"/"+d,datdir+dtst_+z+r+"/"+c+"/"+d)
-                              duplicates(mini_+"/"+iprs_+"/tag-tst",datdir+dtst_+z+r+"/tag")
+                              j = s[4:10]  # these lines depend on the SORT scheme!
+                              c = s[11:13]
+                              d = s[14:17]
+                              duplicates(mtst_+"/"+CYCLES+"/"+dtst_+"/"+dtst_+j+"/"+c+"/"+d,datdir+dtst_+j+"/"+c+"/"+d)
+                              duplicates(mini_+"/"+iprs_+"/tag-tst",datdir+dtst_+j+"/tag")
 
-               if SORT == 1 or SORT == 2:
+               if SORT == 1 or SORT == 2 or SORT == 3:
                     (N3,direc,files) = searchfile(datdir+dtst_+"*/"+CYCLES,"POSCAR.0")
                     export_out(fileout,"Note: %s data generation in cycle % d is all done! % 5d DFT structures are generated in % s" % (dtst_.upper(),cyc,N3,datdir+dtst_+"*/"+CYCLES),color = 3)
                if SORT == 0:
@@ -854,36 +902,16 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
           export_out(fileout,"Error: % s does not exist" % model,color = 2);exit()
 
      # initialize the variables according to the number of species
-     if t_setup.NSPC == 1:
-          t_setup.ASPC  = t_setup.TSTA[:]
-     if t_setup.NSPC == 2:
-          t_setup.ASPC  = t_setup.TSTA[:]
-          t_setup.BSPC  = t_setup.TSTB[:]
-     if t_setup.NSPC == 3:
-          t_setup.ASPC  = t_setup.TSTA[:]
-          t_setup.BSPC  = t_setup.TSTB[:]
-          t_setup.CSPC  = t_setup.TSTC[:]
      t_setup.SPCN  = mkarray_2D(t_setup.NSPC,len(t_setup.ASPC))
      for j in range(0,t_setup.NSPC):
-          if j == 0:
-               for i in range(0,len(t_setup.ASPC)):
-                    t_setup.SPCN[j][i] = t_setup.ASPC[i]
-          if j == 1:
-               for i in range(0,len(t_setup.BSPC)):
-                    t_setup.SPCN[j][i] = t_setup.BSPC[i]
-          if j == 2:
-               for i in range(0,len(t_setup.CSPC)):
-                    t_setup.SPCN[j][i] = t_setup.CSPC[i]
+          for i in range(0,len(t_setup.ASPC)):
+               t_setup.SPCN[j][i] = t_setup.SPCT[j][i]
      t_setup.SIZN = []
      for j in range(0,len(t_setup.ASPC)):
-          c = 0
-          for i in range(0,t_setup.NSPC):
-               c += t_setup.SPCN[i][j] 
-          t_setup.SIZN.append(c)
+          t_setup.SIZN.append(t_setup.SIZT[j])
      t_setup.NPOP = []
      for j in range(0,len(t_setup.SIZN)):
           t_setup.NPOP.append(t_setup.TNPP)
-
      t_setup.NSW0  = 0
      t_setup.PGPA  = t_setup.TGPA[:]
      t_setup.PWGT  = t_setup.TPWT[:]
@@ -904,6 +932,8 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
                POPULN = format(i,"02d")
                SRCDIR = srcdir+PRESSU+"/"+POPULN  # always indexed as: EVO/cycle/pressure/population
                if SORT == 1:
+                    DATDIR = datdir+devo_+t_setup.THSH[z][i]+"/"+CYCLES   # indexed using hash
+               if SORT == 3:
                     DATDIR = datdir+devo_+PRESSU+POPULN+"/"+CYCLES # indexed as: DAT/"evo"pressure"population"/cycle
                if SORT == 2:
                     DATDIR = datdir+devo_+PRESSU+"/"+CYCLES # indexed as: DAT/"evo"pressure/cycle/population
@@ -923,6 +953,8 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
                reread_stp(fileout,t_setup,cwd+"/setup")
                POPULN = format(i,"02d")
                if SORT == 1:
+                    DATDIR = datdir+devo_+t_setup.THSH[z][i]+"/"+CYCLES   # indexed using hash
+               if SORT == 3:
                     DATDIR = datdir+devo_+PRESSU+POPULN+"/"+CYCLES # indexed as: DAT/"evo"pressure"population"/cycle
                if SORT == 2:
                     DATDIR = datdir+devo_+PRESSU+"/"+CYCLES # indexed as: DAT/"evo"pressure/cycle/population
@@ -937,10 +969,11 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
                          # try to symmetrize structures before the DFT runs!
                          duplicates(mindir+"P"+CYCLES+tag+m,"POSCAR")
                          os.system("./"+mini_+"/maise -spg 0.1 1000 |tail -n 1 > tmpspg")
-                         if file_nthln("tmpspg",0) == "":
-                              duplicates(mindir+"P"+CYCLES+tag+m,run+"/POSCAR")
+                         s = file_nthln("tmpspg",0).split()
+                         if does__exst("CONV") and len(s) == 5 and is___float(s[4]) and float(s[4]) >= 0.99:
+                              duplicates("CONV",run+"/POSCAR") # spg solver worked; maise >= 2.7
                          else:
-                              duplicates("CONV",run+"/POSCAR")
+                              duplicates(mindir+"P"+CYCLES+tag+m,run+"/POSCAR")  # spg solver failed
                          removes_fd("POSCAR CONV PRIM str.cif tmpspg")
                          duplicates(cwd+"/"+mini_+"/INCAR", run)
                          replacestr(run+"/INCAR","PPPP",str(t_setup.PGPA[int(z)]*10.0))
@@ -948,7 +981,7 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
                          replacestr(run+"/INCAR","GGGG",str(t_setup.ISIF))
                          replacestr(run+"/INCAR","SMSM",str(t_setup.SMER))
                          replacestr(run+"/INCAR","SGSG",str(t_setup.SIGM))
-                         if not t_setup.SYMP == 0.0:
+                         if t_setup.SYMP != 0.0:
                               addstrfile(run+"/INCAR","SYMPREC="+str(t_setup.SYMP))
                          if t_setup.SORB > 0:
                               addstrfile(run+"/INCAR","LSORBIT=.TRUE.")
@@ -982,6 +1015,8 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
                PRESSU = format(z,"02d")
                POPULN = format(i,"02d")
                if SORT == 1:
+                    DATDIR = datdir+devo_+t_setup.THSH[z][i]+"/"+CYCLES   # indexed using hash
+               if SORT == 3:
                     DATDIR = datdir+devo_+PRESSU+POPULN+"/"+CYCLES # indexed as: DAT/"evo"pressure"population"/cycle
                if SORT == 2:
                     DATDIR = datdir+devo_+PRESSU+"/"+CYCLES # indexed as: DAT/"evo"pressure/cycle/population
@@ -1001,7 +1036,7 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
                               spg2N.append(file_nthln("tmpspg",0).split()[1])
                          removes_fd("POSCAR CONV PRIM str.cif tmpspg")
                          src = file_nthln(mindir+"P"+CYCLES+tag+m,0).split()[0]
-                         (k,l,s) = findlststr(src+"/OUTCAR.1","y=") # to read enthalpy/atom
+                         (k,l,s) = findlststr(src+"/OUTCAR.0","y=") # to read enthalpy/atom
                          enerN.append(float(s.split()[7])) # for MAISE outcar: enthalpy/atom
                          pos = import_str(mindir+"P"+CYCLES+tag+m)
                          voleN.append(float(volume_str(pos)/float(pos.NATM)))
@@ -1054,14 +1089,20 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
                # collect the DFT energy of NN minima in test/ directory
                for j in range(0,len(enerN)):
                     r  = ranks[j]
-                    if does__exst(basdir+adrsD[r]+"/OUTCAR.1") and does__exst(basdir+adrsD[r]+"/POSCAR.1"):
-                         atstdir = cwd+"/"+mtst_+"/"+CYCLES+"/"+dtst_+"/"+dtst_+PRESSU+POPULN+"/"+CYCLES+"/"+format(j,"03d")
-                         (o,tmpn,tmps) = readoutcar(basdir+adrsD[r]+"/OUTCAR.1", read = "first")
+                    if does__exst(basdir+adrsD[r]+"/OUTCAR.0") and does__exst(basdir+adrsD[r]+"/POSCAR.0"):
+                         atstdir = cwd+"/"+mtst_+"/"+CYCLES+"/"+dtst_+"/"+dtst_+t_setup.THSH[int(PRESSU)][int(POPULN)]+"/"+CYCLES+"/"+format(j,"03d")
+                         (o,tmpn,tmps) = readoutcar(basdir+adrsD[r]+"/OUTCAR.0", read = "first")
                          if tmpn > 0:
                               mkdir_tree(atstdir)
                               datdat_str(fileout,tmps[0],atstdir)
-                              duplicates(basdir+adrsD[r]+"/POSCAR.1",atstdir+"/POSCAR.0")
-                              duplicates(cwd+"/"+mini_+"/"+iprs_+"/tag-tst",cwd+"/"+mtst_+"/"+CYCLES+"/"+dtst_+"/"+dtst_+PRESSU+POPULN+"/tag")
+                              duplicates(basdir+adrsD[r]+"/POSCAR.0",atstdir+"/POSCAR.0")
+                              duplicates(cwd+"/"+mini_+"/"+iprs_+"/tag-tst",cwd+"/"+mtst_+"/"+CYCLES+"/"+dtst_+"/"+dtst_+t_setup.THSH[int(PRESSU)][int(POPULN)]+"/tag")
+                              if doesntexst(cwd+"/"+mtst_+"/"+CYCLES+"/"+dtst_+"/"+dtst_+t_setup.THSH[int(PRESSU)][int(POPULN)]+"/inf"):
+                                   s = ""
+                                   for j in range(0,t_setup.NSPC):
+                                        s += str(t_setup.SPCT[j][int(POPULN)])+" "
+                                   addstrfile(cwd+"/"+mtst_+"/"+CYCLES+"/"+dtst_+"/"+dtst_+t_setup.THSH[int(PRESSU)][int(POPULN)]+"/inf","pressure % s" % (str(t_setup.TGPA[int(PRESSU)])))
+                                   addstrfile(cwd+"/"+mtst_+"/"+CYCLES+"/"+dtst_+"/"+dtst_+t_setup.THSH[int(PRESSU)][int(POPULN)]+"/inf","composit % s" % (s))
 
      export_out(fileout,"Note: %s run for cycle % d is completed" % (runt,cyc),color = 3)
 

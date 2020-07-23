@@ -5,9 +5,6 @@
                   Python interface to maise                     
      for automated neural network potential construction
                                                                 
-                                                                
-              version 1.0.05   07/08/2020                    
-                                                                
                           ====                              
                                                                 
         With any use of this script, please cite:              
@@ -28,8 +25,9 @@
                                                                 
                     HOW-TO and NOTES                          
                                                                 
- 1) This wrapper is developed for automated dataset generation  
-    with MAISE and VASP codes for neural network potentials.    
+ 1) The maise-net wrapper, version 2.0, is developed for 
+    automated dataset generation with MAISE and VASP codes 
+    for automated construction of neural network potentials.    
     It generates: single atom reference data (REFS), 2-4 atoms      
     clusters (CLST), equation of state for high-symmetry  
     structures (EOSZ), and evolutionary datasets of bulk or      
@@ -46,8 +44,9 @@
     with VASP package. VASP should be already installed on      
     user's system with "vasp" executable in the system path.    
                                                                 
- 4) "maise" executive and proper "POTCAR" for the system        
-    should be provided in the local INI/ directory.             
+ 4) "maise" executive (version 2.7 or newer) and proper 
+    "POTCAR" for the system should be provided in the 
+     local INI/ directory by the user.             
                                                                 
  5) Following files are job related and cluster specific;       
     their header should be manually adjusted in the indicated   

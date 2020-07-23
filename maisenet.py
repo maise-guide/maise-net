@@ -6,7 +6,7 @@
 #                for automated data generation                   #
 #                                                                #
 #                                                                #
-#                 version 1.0.05   07/08/2020                    # 
+#                 version 2.0.00   07/22/2020                    # 
 #                                                                #
 #                             -----                              #
 #                                                                #
@@ -49,7 +49,7 @@
 #     user's system with "vasp" executable in the system path.   #
 #                                                                #
 # 4)  "maise" executive and proper "POTCAR" for the system       #
-#     should be provided in the local INI/ directory.            #
+#     should be provided in the local INI/ directory by the user.#
 #                                                                #
 # 5)  Following files are job related and cluster specific;      #
 #     their header should be manually adjusted in the indicated  #
@@ -72,6 +72,7 @@ from maisenet_main  import *
 from maisenet_inot  import *
 from maisenet_task  import initit_stp
 
+
 #================================================================#
 #                        LOAD THE SETUP                          #
 #================================================================#
@@ -79,20 +80,23 @@ from maisenet_task  import initit_stp
 # Output file name
 output = mout_
 
-export_hdr(output,"version 1.0.05   07/08/2020")
+export_hdr(output,"version 2.0.00   07/22/2020")
+
+if maise_vers("INI") < 27.0:
+     export_out(output,"Error: this version of the maise-net can only work with maise.2.6 or newer!" ,color = 2);exit()
 
 if not os.path.exists("setup"):
-     export_out(output,"Error: setup file does not exist",color = 1);exit()
+     export_out(output,"Error: setup file does not exist",color = 2);exit()
      
 setup = import_stp("setup")
 
 if setup.JOBT//10 != 8:
-     export_out(output,"Error: JOBT is not data generation",color = 1);exit()
+     export_out(output,"Error: JOBT is not data generation",color = 2);exit()
 
 RUN = setup.JOBT%10
 
 if RUN == JQTE:
-     export_out(output,"Note: terminating at user's request!",color = 2);exit()
+     export_out(output,"Note: terminating at user's request!",color = 3);exit()
 
 #================================================================#
 #                 INITIALIZE THE RUN PARAMETERS                  #
