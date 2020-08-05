@@ -741,7 +741,7 @@ def export_hdr(output, ver): # Output the header of the script
 
 #----------------------------------------------------------------------------------                
 
-def mkplot_err(fileout, setup_g): # Makes histogram and scatter plot for NN testing errors
+def mkplot_err(fileout, plists, setup_g): # Makes histogram and scatter plot for NN testing errors
     if not is_install("gnuplot"):
         export_out(fileout,"Warning: gnuplot does not exist; no plot will be generated",time = 0)
         return
@@ -750,16 +750,16 @@ def mkplot_err(fileout, setup_g): # Makes histogram and scatter plot for NN test
     f.write("set terminal png size 800,600\n")
     f.write("set output '%s-ent.png'\n" % (setup_g.NAME))
     f.write("set title '%s'\n" % (os.getcwd()))
-    for i in range(0,setup_g.PNUM+1):
+    for i in range(0,len(plists)+1): 
         f.write("set linestyle  %d lt 1 lw 2 lc %d pt %d\n" % (i+1,i+1,i+1))
     f.write("set xrange [0:399]\n")
     f.write("set xlabel 'relative enthalpy (meV/atom)'\n")
     f.write("set ylabel 'testing error (meV/atom)'\n")
     f.write("set multiplot\n")
     f.write("plot ")
-    for i in range(0,setup_g.PNUM):
+    for i in range(0,len(plists)): 
         if does__exst("err-ent%d.dat" % i):
-            f.write("'err-ent%d.dat' u 2:1 w points ls %d title '%6.2lf'," % (i,i+1,setup_g.PGPA[i]))
+            f.write("'err-ent%d.dat' u 2:1 w points ls %d title '%6.2lf'," % (i,i+1,float(plists[i])))
     f.write("\n")
     f.write("unset multiplot\n")
     f.close()
@@ -770,7 +770,7 @@ def mkplot_err(fileout, setup_g): # Makes histogram and scatter plot for NN test
     f.write("set terminal png size 800,600\n")
     f.write("set output '%s-his.png'\n" %(setup_g.NAME))
     f.write("set title '%s'\n" % (os.getcwd()))
-    for i in range(0,setup_g.PNUM+1):
+    for i in range(0,len(plists)+1):
         f.write("set linestyle  %d lt 1 lw 2 lc %d pt %d\n" % (i+1,i+1,i+1))
     f.write("width=5\n")
     f.write("hist(x,width)=width*floor(x/width)+width/2.0\n")
@@ -780,8 +780,8 @@ def mkplot_err(fileout, setup_g): # Makes histogram and scatter plot for NN test
     f.write("set ylabel 'count'\n")
     f.write("set multiplot\n")
     f.write("plot ")
-    for i in range(0,setup_g.PNUM):
-        f.write("'err-ent%d.dat' u (hist($1,width)):(1.0) smooth freq w boxes ls %d title '%6.2lf'," % (i,i+1,setup_g.PGPA[i]))
+    for i in range(0,len(plists)):
+        f.write("'err-ent%d.dat' u (hist($1,width)):(1.0) smooth freq w boxes ls %d title '%6.2lf'," % (i,i+1,float(plists[i])))
     f.write("\n")
     f.write("unset multiplot\n")
     f.close()

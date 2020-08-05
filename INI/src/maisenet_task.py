@@ -1038,13 +1038,10 @@ def mdlerr_chk(fileout, setup_0): # Analysis of testing errors and "relative ent
           if Ntst == 0:
                print("No test data for analysis!")
                return
-          pminim = []
-          pcount = []
+          pminim = {}
+          pcount = {}
+          plists = []
           pindex = []
-          for i in range(0,setup_0.PNUM):
-               pminim.append(100000.0)
-               pcount.append(0)
-               pindex.append(i)
           efiles = []
           errors = []
           addres = []
@@ -1067,32 +1064,17 @@ def mdlerr_chk(fileout, setup_0): # Analysis of testing errors and "relative ent
                     if does__exst(route+"/dat.dat"):
                          n,p,o = findlststr(route+"/dat.dat","pres")
                          if n > 0:
-                              for j in range(0,setup_0.PNUM):
-                                   if float(o.split()[1]) == setup_0.PGPA[j]:
-                                        P = str(j)
-                    elif devo_ in route:
-                         s = route.split(devo_,1)[1][0:3]
-                         if s[0] == "/":
-                              P = s[1:3]
-                         else:
-                              P = s[0:2]
+                              P = o.split()[1]
                     elif setup_0.PNUM == 1:
-                         P = "0"
+                         P = "0.0"
                     else:
                          continue
-                    try:
-                         num = int(P)
-                    except:
-                         continue
 
-                    if int(P) >= setup_0.PNUM:
-                         continue
-                         
                     addres.append(route)
                     efiles.append(s.split()[1])
                     errors.append(float(s.split()[4]))
                     dftene.append(float(s.split()[2]))
-                    enthal.append(dftene[len(dftene)-1]+setup_0.PGPA[int(P)]*volatm[len(volatm)-1]/(160.21766208))
+                    enthal.append(dftene[len(dftene)-1]+float(P)*volatm[len(volatm)-1]/(160.21766208))
                else:
                     P = "0"
                     volatm.append(0.0)
@@ -1102,26 +1084,36 @@ def mdlerr_chk(fileout, setup_0): # Analysis of testing errors and "relative ent
                     dftene.append(float(s.split()[2]))
                     enthal.append(dftene[len(dftene)-1])
 
-               pgpaes.append(int(P))
-               pcount[int(P)] += 1
-               
-               if enthal[len(enthal)-1] < pminim[int(P)]:
-                    pminim[int(P)] = enthal[len(enthal)-1]
+               pgpaes.append(P)
+               if P in pcount:
+                    pcount[P] += 1
+               else:
+                    pcount[P] = 1
 
-          pindex = [[0.0 for i in range(max(pcount))] for j in range(setup_0.PNUM)]
-          for i in range(0,setup_0.PNUM):
+               if not P in pminim:
+                    pminim[P] = 1000000.0
+
+               if enthal[len(enthal)-1] < pminim[P]:
+                    pminim[P] = enthal[len(enthal)-1]
+
+          for key in pcount.keys():
+               plists.append(key) # this is a replacement to setup.PGPA
+          plists.sort()
+
+          pindex = [[0.0 for i in range(pcount[max(pcount,key=pcount.get)])] for j in range(len(plists))]
+          for i in range(len(plists)):
                k = 0
                for j in range(0,len(enthal)):
-                    if pgpaes[j] == i:
+                    if pgpaes[j] == plists[i]:
                          pindex[i][k] = j
                          k += 1
 
-          for i in range(0,setup_0.PNUM):
-               if pcount[i] > 0:
+          for i in range(0,len(plists)):
+               if pcount[plists[i]] > 0:
                     f = open("tmp1234321","w")
-                    for j in range(0,pcount[i]):
+                    for j in range(0,pcount[plists[i]]):
                          ind = pindex[i][j]
-                         f.write(" % 10.2lf  % 10.2lf  % s\n" % (1000.0*errors[ind],1000.0*(enthal[ind]-pminim[i]),addres[ind]))
+                         f.write(" % 10.2lf  % 10.2lf  % s\n" % (1000.0*errors[ind],1000.0*(enthal[ind]-pminim[plists[i]]),addres[ind]))
                     f.close()
                     os.system("sort -g -k2,2 tmp1234321 > err-ent%d.dat" % i)
                     removes_fd("tmp1234321")
@@ -1131,13 +1123,13 @@ def mdlerr_chk(fileout, setup_0): # Analysis of testing errors and "relative ent
           abserr = [abs(k) for k in errors]
           srt    = sorted(range(len(abserr)),key  = lambda k: abserr[k], reverse = True)
           f.write("=====  num     efile       tst_err    ratio    structure\n")
-          for j in range(0,setup_0.PNUM):
-               f.write("===== % 6.2lf GPa\n" % setup_0.PGPA[j])
+          for j in range(0,len(plists)):
+               f.write("===== % 6.2lf GPa\n" % float(plists[j]))
                for i in range(0,len(efiles)):
                     ind = srt[i]
-                    if abs(errors[ind]) >= 1.0*ERROR and pgpaes[ind] == j:
+                    if abs(errors[ind]) >= 1.0*ERROR and pgpaes[ind] == plists[j]:
                          f.write("      % 04d  % 10s  % 10.2lf ( % 5.3lf )  % s\n" % (n,efiles[ind],1000.0*errors[ind],abs(errors[ind])/ERROR,addres[ind]))
                          n += 1
           f.close()
                
-          mkplot_err(fileout,setup_0)
+          mkplot_err(fileout,plists,setup_0)
