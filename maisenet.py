@@ -6,7 +6,7 @@
 #                for automated data generation                   #
 #                                                                #
 #                                                                #
-#                 version 2.0.01   08/05/2020                    # 
+#                 version 2.0.02   08/07/2020                    # 
 #                                                                #
 #                             -----                              #
 #                                                                #
@@ -80,7 +80,7 @@ from maisenet_task  import initit_stp
 # Output file name
 output = mout_
 
-export_hdr(output,"version 2.0.01   08/05/2020")
+export_hdr(output,"version 2.0.02   08/07/2020")
 
 if maise_vers("INI") < 27.0:
      export_out(output,"Error: this version of the maise-net can only work with maise.2.7 or newer!" ,color = 2);exit()

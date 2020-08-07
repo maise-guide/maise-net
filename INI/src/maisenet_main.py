@@ -902,12 +902,13 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
           export_out(fileout,"Error: % s does not exist" % model,color = 2);exit()
 
      # initialize the variables according to the number of species
-     t_setup.SPCN  = mkarray_2D(t_setup.NSPC,len(t_setup.ASPC))
+     t_setup.SPCN  = []
+     t_setup.SPCN  = mkarray_2D(t_setup.NSPC,len(t_setup.TSTA))
      for j in range(0,t_setup.NSPC):
-          for i in range(0,len(t_setup.ASPC)):
+          for i in range(0,len(t_setup.TSTA)):
                t_setup.SPCN[j][i] = t_setup.SPCT[j][i]
      t_setup.SIZN = []
-     for j in range(0,len(t_setup.ASPC)):
+     for j in range(0,len(t_setup.TSTA)):
           t_setup.SIZN.append(t_setup.SIZT[j])
      t_setup.NPOP = []
      for j in range(0,len(t_setup.SIZN)):
