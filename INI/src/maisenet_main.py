@@ -415,6 +415,7 @@ def DATGEN_CLS(RUN, output, setup_0): # CLST DATA GENERATION
                export_str(pos,run+"/POSCAR")
                # 4-atom structures
                pos.NATM       = 4
+               pos.NAET = []
                for j in range(0,z_setup.NSPC):
                     pos.NAET.append(pos.NATM/z_setup.NSPC)
                pos.POSI[0]    = [0.5,0.5,0.5]

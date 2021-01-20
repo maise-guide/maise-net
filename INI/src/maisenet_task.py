@@ -176,7 +176,8 @@ def submit_esj(cwd, inidir, datdir, mindir, run, fileout, estype, i, z, cyc, set
                if doesntexst("POOL"):
                     export_out(fileout,"Warning: ES was not successful in % s" % (run),time = 0)
                else:
-                    (n,di,fi) = searchfile("POOL/","POSCAR*")
+                    fi = os.listdir("POOL/")
+                    n = len([posfi for posfi in fi if "POSCAR" in posfi])
                     for j in range(0,n):
                          m    = format(j,"03d")
                          des  = datdir+"/"+m+"000"
