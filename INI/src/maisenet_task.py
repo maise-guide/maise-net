@@ -257,8 +257,13 @@ def submit_dft(cwd, inidir, datdir, fileout, jobfile, setup_0): # Create a list 
                 replacestr("INCAR","PPPP",str(setup_0.PGPA[0]*10.0))
                 replacestr("INCAR","AAAA",str(setup_0.PREC))
                 replacestr("INCAR","GGGG",str(setup_0.ISIF))
-                replacestr("INCAR","SMSM",str(setup_0.SMER))
                 replacestr("INCAR","SGSG",str(setup_0.SIGM))
+                if setup_0.NDIM == 0:
+                     replacestr("INCAR","SMSM",str(0))
+                     replacestr("INCAR","NPAR=4","NPAR=1")
+                     replacestr("INCAR","NSIM=4","NSIM=1")
+                else:
+                     replacestr("INCAR","SMSM",str(setup_0.SMER))
                 if setup_0.SYMP != 0.0:
                      addstrfile("INCAR","SYMPREC="+str(setup_0.SYMP))
                 if setup_0.SORB > 0:
