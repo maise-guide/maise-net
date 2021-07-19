@@ -36,7 +36,7 @@ RPAR  1                        # number of cores for NN relaxation jobs
 NPAR  8                        # number of cores used for parsing
 NSYM  51                       # number of symmetry function components
 RCUT  1                        # BP sym. func. cut-off radius (0) 6 A (1) 7.5 A
-FMRK  0.5                      # ratio of atomic forces for training
+FMRK  0.35                      # ratio of atomic forces for training
 
 #========================
 # EVOS DATA MODE
