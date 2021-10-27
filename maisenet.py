@@ -138,6 +138,7 @@ if (RUN == JEVO):
           exit()
 
      for cyc in range(setup.SITR,setup.NITR+1):
+          DATGEN_EOS(0,output,0,setup)
           DATGEN_EVO(RUN,output,cyc,setup)
 
 #================================================================#

@@ -161,9 +161,7 @@ def DATGEN_EOS(RUN, output, cyc, setup_0): # EOS DATA GENERATION
           for i in range(0,N):
                tag = files[i].replace("POSCAR"+str(x_setup.NSPC),"")
                run = eosdir+tag
-               if does__exst(run) and x_setup.ERNI == 0:
-                    export_out(fileout,"Error: % s directory already exists" % run,color = 2);exit()
-               if does__exst(run) and x_setup.ERNI == 1:
+               if does__exst(run):
                     export_out(fileout,"           Skipping... % s" % run,time = 0,color = 3)
                     continue
                mkdir_tree(run)
@@ -223,17 +221,11 @@ def DATGEN_EOS(RUN, output, cyc, setup_0): # EOS DATA GENERATION
           if doesntexst(eosdir+tag+"/CONTCAR.0"):
                export_out(fileout,"Error: the file %s does not exist" % (eosdir+tag+"/CONTCAR.0"),color = 2);exit()
           if (SORT == 1 or SORT == 2 or SORT == 3) and does__exst(datdir+deos_+tag):
-               if x_setup.ERNI == 0:
-                    export_out(fileout,"Error: % s directory already exists" % (datdir+deos_+tag),color = 2);exit()
-               else:
-                    export_out(fileout,"           Skipping... % s" % (datdir+deos_+tag),time = 0,color = 3)
-                    continue
+               export_out(fileout,"           Skipping... % s" % (datdir+deos_+tag),time = 0,color = 3)
+               continue
           if SORT == 0 and does__exst(datdir+deos_+"/"+tag):
-               if x_setup.ERNI == 0:
-                    export_out(fileout,"Error: % s directory already exists" % (datdir+deos_+"/"+tag),color = 2);exit()
-               else:
-                    export_out(fileout,"           Skipping... % s" % (datdir+deos_+"/"+tag),time = 0,color = 3)
-                    continue
+               export_out(fileout,"           Skipping... % s" % (datdir+deos_+"/"+tag),time = 0,color = 3)
+               continue
           for j in range(0,num+1):
                lbl = format(j,"02d")
                if RUN != JBAS:
@@ -929,7 +921,11 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
      for z in range(0,t_setup.PNUM):
           PRESSU = format(z,"02d")
           for i in range(0,len(t_setup.SIZN)):
-               t_setup.NGEN  = t_setup.TNGN[i]
+               totatoms=0
+               for k in range(0,t_setup.NSPC):
+                 totatoms += t_setup.SPCN[k][i]
+               t_setup.NGEN = min(int(totatoms + float(pow(totatoms,2))/4.0), 50)
+               #t_setup.NGEN  = t_setup.TNGN[i]
                reread_stp(fileout,t_setup,cwd+"/setup")
                POPULN = format(i,"02d")
                SRCDIR = srcdir+PRESSU+"/"+POPULN  # always indexed as: EVO/cycle/pressure/population
