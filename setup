@@ -30,7 +30,7 @@ kdns  4000
 LREG  1e-8                     # regularization
 NNNU  10 10                    # number of neurons in hidden layers
 NNGT  1  1                     # activation function type for hidden layers
-RPAR  1                        # number of cores for NN relaxation jobs
+RPAR  2                        # number of cores for NN relaxation jobs
 
 #--- parsing parameters
 NPAR  8                        # number of cores used for parsing
