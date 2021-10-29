@@ -463,6 +463,13 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
      # local copy of setup
      m_setup = deepcopy(setup_0)
 
+     if m_setup.NDIM == 0:
+       m_setup.SIGM = defsigma
+       m_setup.SMER = 0
+       m_setup.KDNS = 0
+       m_setup.kdns = 0
+       m_setup.ISIF = 2
+
      CYCLES = format(cyc,"02d")
 
      cwd = os.getcwd()
@@ -661,6 +668,9 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                replacestr(run+"/INCAR","GGGG",str(m_setup.ISIF))
                replacestr(run+"/INCAR","SMSM",str(m_setup.SMER))
                replacestr(run+"/INCAR","SGSG",str(m_setup.SIGM))
+               if setup_0.NDIM == 0:
+                    replacestr(run+"/INCAR","NPAR=4","NPAR=1")
+                    replacestr(run+"/INCAR","NSIM=4","NSIM=1")
                if m_setup.SYMP != 0.0:
                     addstrfile(run+"/INCAR","SYMPREC="+str(m_setup.SYMP))
                if m_setup.SORB > 0:
@@ -745,6 +755,9 @@ def DATGEN_EVO(RUN, output, cyc, setup_0): # EVOS DATA GENERATION
                          replacestr(run+"/INCAR","GGGG",str(m_setup.ISIF))
                          replacestr(run+"/INCAR","SMSM",str(m_setup.SMER))
                          replacestr(run+"/INCAR","SGSG",str(m_setup.SIGM))
+                         if m_setup.NDIM == 0:
+                            replacestr(run+"/INCAR","NPAR=4","NPAR=1")
+                            replacestr(run+"/INCAR","NSIM=4","NSIM=1")
                          if m_setup.SYMP != 0.0:
                               addstrfile(run+"/INCAR","SYMPREC="+str(m_setup.SYMP))
                          if m_setup.SORB > 0:
@@ -875,6 +888,12 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
      # local copy of setup
      t_setup = deepcopy(setup_0)
 
+     if t_setup.NDIM == 0:
+       t_setup.SIGM = defsigma
+       t_setup.SMER = 0
+       t_setup.KDNS = 0
+       t_setup.ISIF = 2
+
      cwd = os.getcwd()
      fileout = cwd+"/"+output
 
@@ -921,11 +940,13 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
      for z in range(0,t_setup.PNUM):
           PRESSU = format(z,"02d")
           for i in range(0,len(t_setup.SIZN)):
-               totatoms=0
-               for k in range(0,t_setup.NSPC):
-                 totatoms += t_setup.SPCN[k][i]
-               t_setup.NGEN = min(int(totatoms + float(pow(totatoms,2))/4.0), 50)
-               #t_setup.NGEN  = t_setup.TNGN[i]
+               if len(t_setup.TNGN) == 0 or (not type(t_setup.TNGN) is list):
+                 totatoms=0
+                 for k in range(0,t_setup.NSPC):
+                   totatoms += t_setup.SPCN[k][i]
+                 t_setup.NGEN = min(totatoms + int(pow(totatoms,2)/4.0), 100)
+               else:
+                 t_setup.NGEN  = t_setup.TNGN[i]
                reread_stp(fileout,t_setup,cwd+"/setup")
                POPULN = format(i,"02d")
                SRCDIR = srcdir+PRESSU+"/"+POPULN  # always indexed as: EVO/cycle/pressure/population
@@ -979,6 +1000,9 @@ def DATGEN_TST(RUN, output, cyc, cal, setup_0): # TEST THE NN MODEL
                          replacestr(run+"/INCAR","GGGG",str(t_setup.ISIF))
                          replacestr(run+"/INCAR","SMSM",str(t_setup.SMER))
                          replacestr(run+"/INCAR","SGSG",str(t_setup.SIGM))
+                         if t_setup.NDIM == 0:
+                            replacestr(run+"/INCAR","NPAR=4","NPAR=1")
+                            replacestr(run+"/INCAR","NSIM=4","NSIM=1")
                          if t_setup.SYMP != 0.0:
                               addstrfile(run+"/INCAR","SYMPREC="+str(t_setup.SYMP))
                          if t_setup.SORB > 0:

@@ -51,6 +51,9 @@ def submit_esj(cwd, inidir, datdir, mindir, run, fileout, estype, i, z, cyc, set
           duplicates(cwd+"/"+inidir+"/POTCAR",run+"/INI")
           replacestr(run+"/INI/INCAR0","PPPP",str(setup_0.PGPA[z]*10.0))
           replacestr(run+"/INI/INCAR0","GGGG",str(setup_0.ISIF))
+          if setup_0.NDIM == 0:
+            replacestr(run+"/INI/INCAR0","NPAR=4","NPAR=1")
+            replacestr(run+"/INI/INCAR0","NSIM=4","NSIM=1")
           replacestr(run+"/INI/INCAR0","SMSM",str(setup_0.SMER))
           replacestr(run+"/INI/INCAR0","SGSG",str(setup_0.SIGM))
           replacestr(run+"/INI/INCAR0","AAAA",str(setup_0.prec))
@@ -258,12 +261,10 @@ def submit_dft(cwd, inidir, datdir, fileout, jobfile, setup_0): # Create a list 
                 replacestr("INCAR","AAAA",str(setup_0.PREC))
                 replacestr("INCAR","GGGG",str(setup_0.ISIF))
                 replacestr("INCAR","SGSG",str(setup_0.SIGM))
+                replacestr("INCAR","SMSM",str(setup_0.SMER))
                 if setup_0.NDIM == 0:
-                     replacestr("INCAR","SMSM",str(0))
                      replacestr("INCAR","NPAR=4","NPAR=1")
                      replacestr("INCAR","NSIM=4","NSIM=1")
-                else:
-                     replacestr("INCAR","SMSM",str(setup_0.SMER))
                 if setup_0.SYMP != 0.0:
                      addstrfile("INCAR","SYMPREC="+str(setup_0.SYMP))
                 if setup_0.SORB > 0:
@@ -559,6 +560,9 @@ def similr_chk(cwd, inidir, mindir, datdir, fileout, cyc, jobfile, NM, MINIMA, s
                          replacestr(run+"/INCAR","PPPP",str(setup_0.PGPA[int(P)]*10.0))
                          replacestr(run+"/INCAR","AAAA",str(setup_0.prec))
                          replacestr(run+"/INCAR","GGGG",str(setup_0.ISIF))
+                         if setup_0.NDIM == 0:
+                           replacestr(run+"/INCAR","NPAR=4","NPAR=1")
+                           replacestr(run+"/INCAR","NSIM=4","NSIM=1")
                          replacestr(run+"/INCAR","SMSM",str(setup_0.SMER))
                          replacestr(run+"/INCAR","SGSG",str(setup_0.SIGM))
                          if setup_0.SYMP != 0.0:
@@ -598,6 +602,9 @@ def similr_chk(cwd, inidir, mindir, datdir, fileout, cyc, jobfile, NM, MINIMA, s
                          replacestr(run+"/INCAR","PPPP",str(setup_0.PGPA[int(P)]*10.0))
                          replacestr(run+"/INCAR","AAAA",str(setup_0.PREC))
                          replacestr(run+"/INCAR","GGGG",str(setup_0.ISIF))
+                         if setup_0.NDIM == 0:
+                           replacestr(run+"/INCAR","NPAR=4","NPAR=1")
+                           replacestr(run+"/INCAR","NSIM=4","NSIM=1")
                          replacestr(run+"/INCAR","SMSM",str(setup_0.SMER))
                          replacestr(run+"/INCAR","SGSG",str(setup_0.SIGM))
                          if setup_0.SYMP != 0.0:
@@ -830,13 +837,13 @@ def initit_stp(RUN, inidir, output, setup_0): # Check initial directories; and i
           setup_0.TNPP = tstnpop
      if setup_0.TITR == 0:
           setup_0.TITR = tstiter
-     if len(setup_0.TNGN) == 0 or (not type(setup_0.TNGN) is list):
-          if setup_0.NSPC == 1:
-               setup_0.TNGN = tstngen1[:]
-          if setup_0.NSPC == 2:
-               setup_0.TNGN = tstngen2[:]
-          if setup_0.NSPC == 3:
-               setup_0.TNGN = tstngen3[:]
+     #if len(setup_0.TNGN) == 0 or (not type(setup_0.TNGN) is list):
+          #if setup_0.NSPC == 1:
+          #     setup_0.TNGN = tstngen1[:]
+          #if setup_0.NSPC == 2:
+          #     setup_0.TNGN = tstngen2[:]
+          #if setup_0.NSPC == 3:
+          #     setup_0.TNGN = tstngen3[:]
      if len(setup_0.TGPA) == 0 or (not type(setup_0.TGPA) is list):
           setup_0.TGPA = tstpgpa[:]
      if len(setup_0.TPWT) == 0 or (not type(setup_0.TPWT) is list):
